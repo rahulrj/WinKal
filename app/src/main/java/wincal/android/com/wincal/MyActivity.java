@@ -1,9 +1,10 @@
 package wincal.android.com.wincal;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 
 
 public class MyActivity extends ActionBarActivity {
@@ -12,6 +13,19 @@ public class MyActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
+
+        ListView month_listview= (ListView) findViewById(R.id.month_listview);
+        month_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
+                "data2","data3","data3","data3","data3","data3","data3" }));
+
+        ListView  date_listview= (ListView) findViewById(R.id.date_listview);
+        date_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
+                "data2","data3","data4","data5","data6","data7","data8" }));
+
+        ListView  year_listview= (ListView) findViewById(R.id.year_listview);
+        year_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
+                "data2","data3","data3","data3","data3","data3","data3" }));
+
     }
 
 

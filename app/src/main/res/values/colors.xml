@@ -2,5 +2,6 @@
 <resources>
 
     <color name="cal_background">#212021</color>
+    <color name="list_row_border_color">#BDBDBD</color>
 
 </resources>
