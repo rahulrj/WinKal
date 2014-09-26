@@ -14,17 +14,23 @@ public class MyActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
 
+        MonthAdapter adapter =new MonthAdapter(this, new String[] { "data1",
+                "data2","data3","data4","data5","data6","data7","data8" });
+
         ListView month_listview= (ListView) findViewById(R.id.month_listview);
         month_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
                 "data2","data3","data3","data3","data3","data3","data3" }));
 
         ListView  date_listview= (ListView) findViewById(R.id.date_listview);
-        date_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
-                "data2","data3","data4","data5","data6","data7","data8" }));
+        date_listview.setAdapter(adapter);
 
         ListView  year_listview= (ListView) findViewById(R.id.year_listview);
         year_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
                 "data2","data3","data3","data3","data3","data3","data3" }));
+
+
+
+        date_listview.setSelection(adapter.getCount()/2+1);
 
     }
 
