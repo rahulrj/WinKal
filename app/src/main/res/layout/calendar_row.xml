@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/cal_date"
+            android:id="@+id/main_text"
             android:text="02"
             android:textSize="32dp"
             android:textColor="@android:color/white"/>
@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/temp_text"
+            android:id="@+id/sub_text"
             android:text="February"
             android:textSize="12dp"
             android:textColor="@android:color/white"/>

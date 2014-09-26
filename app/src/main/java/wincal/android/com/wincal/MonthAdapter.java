@@ -50,10 +50,14 @@ public class MonthAdapter extends BaseAdapter{
         View vi = convertView;
         if (vi == null)
             vi = inflater.inflate(R.layout.calendar_row, null);
-       TextView text = (TextView) vi.findViewById(R.id.temp_text);
+
+       TextView subText = (TextView) vi.findViewById(R.id.sub_text);
+       TextView mainText=(TextView)vi.findViewById(R.id.main_text);
 
         int actualPosition = position % data.length;
-        text.setText(data[actualPosition]);
+        subText.setText(data[actualPosition]);
+        mainText.setText(String.valueOf(actualPosition+1));
+
         return vi;
     }
 }
