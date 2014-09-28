@@ -1,7 +1,9 @@
 package wincal.android.com.wincal;
 
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -26,11 +28,18 @@ public class MyActivity extends ActionBarActivity {
         year_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
                 "data2","data3","data4","data5","data6","data7","data8"  }));
 
-        date_listview.setSelection(adapter.getCount()/2);
-        month_listview.setSelection(adapter.getCount()/2);
-        year_listview.setSelection(adapter.getCount()/2+1);
+       // date_listview.setSelection(adapter.getCount()/2);
+      // month_listview.setSelection(adapter.getCount()/2-3);
+      //  year_listview.setSelection(adapter.getCount()/2+1);
 
-        //month_listview.setSelectionFromTop(adapter.getCount()/2+3,10);
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x/2;
+        int height = size.y/2;
+
+       month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
+
 
     }
 
