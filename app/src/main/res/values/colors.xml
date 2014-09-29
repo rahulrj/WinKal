@@ -3,5 +3,7 @@
 
     <color name="cal_background">#212021</color>
     <color name="list_row_border_color">#BDBDBD</color>
+    <color name="selected_row_color">#4A4D4A</color>
+
 
 </resources>

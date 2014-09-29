@@ -6,7 +6,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ListView;
+import android.view.View.OnTouchListener;
 
 
 public class MyActivity extends ActionBarActivity {
@@ -19,8 +22,8 @@ public class MyActivity extends ActionBarActivity {
         setContentView(R.layout.activity_my);
 
 
-        MonthAdapter adapter =new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
-        adapter.setCurrentMonthPos(adapter.getCount()/2);
+        final MonthAdapter adapter =new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
+        adapter.setCurrentMonthPos(adapter.getCount()/2-3);
 
         ListView month_listview= (ListView) findViewById(R.id.month_listview);
         month_listview.setAdapter(adapter);
@@ -33,19 +36,32 @@ public class MyActivity extends ActionBarActivity {
                 //"data2","data3","data4","data5","data6","data7","data8"  }));
 
        // date_listview.setSelection(adapter.getCount()/2);
-       month_listview.setSelection(adapter.getCount()/2);
+       //month_listview.setSelection(adapter.getCount()/2);
       //  year_listview.setSelection(adapter.getCount()/2+1);
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
-       int width= display.getWidth();
-        int height=display.getHeight();
+       int width= display.getWidth()/2;
+        int height=display.getHeight()/2;
         //int width = size.x/2;
         //int height = size.y/2;
 
         //Toast.makeText(this,""+size.x+" "+size.y,Toast.LENGTH_LONG).show();
 
-       //month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
+       month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
+        month_listview.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+
+                    adapter.setAllItemsVisible(true);
+                    adapter.notifyDataSetChanged();
+                    
+                    return true;
+                }
+                return false;
+            }
+        });
 
 
     }

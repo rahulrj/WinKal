@@ -19,6 +19,7 @@
         android:layout_height="match_parent"
         android:id="@+id/month_listview"
         android:dividerHeight="8dp"
+        android:divider="@android:color/transparent"
         android:scrollbars="none"
         android:layout_marginLeft="8dp"
         android:layout_weight="1"
