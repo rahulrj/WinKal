@@ -1,6 +1,8 @@
 package wincal.android.com.wincal;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ public class MonthAdapter extends BaseAdapter{
     Context context;
     String[] data;
     private static LayoutInflater inflater = null;
+    private int currentMonthPos=0;
 
     public MonthAdapter(Context context, String[] data) {
         // TODO Auto-generated constructor stub
@@ -22,6 +25,14 @@ public class MonthAdapter extends BaseAdapter{
         this.data = data;
         inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+    }
+
+    protected void  setCurrentMonthPos(int pos){
+
+        currentMonthPos=pos;
+       // Toast.makeText(context,""+currentMonthPos,Toast.LENGTH_LONG).show();
+
     }
 
     @Override
@@ -34,7 +45,7 @@ public class MonthAdapter extends BaseAdapter{
     public Object getItem(int position) {
         // TODO Auto-generated method stub
 
-       int actualPosition = position % data.length;
+        int actualPosition = position % data.length;
         return data[actualPosition];
     }
 
@@ -57,6 +68,12 @@ public class MonthAdapter extends BaseAdapter{
         int actualPosition = position % data.length;
         subText.setText(data[actualPosition]);
         mainText.setText(String.valueOf(actualPosition+1));
+
+        if(position==currentMonthPos ){
+
+            Log.d("rahulraja", "" + (position == currentMonthPos));
+            vi.setBackgroundColor(Color.RED);
+        }
 
         return vi;
     }

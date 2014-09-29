@@ -11,25 +11,29 @@ import android.widget.ListView;
 
 public class MyActivity extends ActionBarActivity {
 
+
+    private int currentMonthPosition;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
 
+
         MonthAdapter adapter =new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
+        adapter.setCurrentMonthPos(adapter.getCount()/2);
 
         ListView month_listview= (ListView) findViewById(R.id.month_listview);
         month_listview.setAdapter(adapter);
 
         ListView  date_listview= (ListView) findViewById(R.id.date_listview);
-        date_listview.setAdapter(adapter);
+        //date_listview.setAdapter(adapter);
 
         ListView  year_listview= (ListView) findViewById(R.id.year_listview);
-        year_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
-                "data2","data3","data4","data5","data6","data7","data8"  }));
+        //year_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
+                //"data2","data3","data4","data5","data6","data7","data8"  }));
 
        // date_listview.setSelection(adapter.getCount()/2);
-      // month_listview.setSelection(adapter.getCount()/2-3);
+       month_listview.setSelection(adapter.getCount()/2);
       //  year_listview.setSelection(adapter.getCount()/2+1);
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -38,7 +42,9 @@ public class MyActivity extends ActionBarActivity {
         int width = size.x/2;
         int height = size.y/2;
 
-       month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
+        //Toast.makeText(this,""+size.x+" "+size.y,Toast.LENGTH_LONG).show();
+
+       //month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
 
 
     }
