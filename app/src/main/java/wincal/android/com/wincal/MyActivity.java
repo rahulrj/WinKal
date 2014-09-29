@@ -38,9 +38,10 @@ public class MyActivity extends ActionBarActivity {
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
-        display.getSize(size);
-        int width = size.x/2;
-        int height = size.y/2;
+       int width= display.getWidth();
+        int height=display.getHeight();
+        //int width = size.x/2;
+        //int height = size.y/2;
 
         //Toast.makeText(this,""+size.x+" "+size.y,Toast.LENGTH_LONG).show();
 

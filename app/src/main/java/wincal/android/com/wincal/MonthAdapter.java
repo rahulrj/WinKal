@@ -59,7 +59,7 @@ public class MonthAdapter extends BaseAdapter{
     public View getView(int position, View convertView, ViewGroup parent) {
         // TODO Auto-generated method stub
         View vi = convertView;
-        if (vi == null)
+       // if (vi == null)
             vi = inflater.inflate(R.layout.calendar_row, null);
 
        TextView subText = (TextView) vi.findViewById(R.id.sub_text);
@@ -69,9 +69,11 @@ public class MonthAdapter extends BaseAdapter{
         subText.setText(data[actualPosition]);
         mainText.setText(String.valueOf(actualPosition+1));
 
+        Log.d("rahulraja", "hey");
+
+
         if(position==currentMonthPos ){
 
-            Log.d("rahulraja", "" + (position == currentMonthPos));
             vi.setBackgroundColor(Color.RED);
         }
 
