@@ -3,19 +3,26 @@ package wincal.android.com.wincal;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ListView;
 import android.view.View.OnTouchListener;
+import android.widget.AbsListView;
+import android.widget.ListView;
+import android.widget.AbsListView.OnScrollListener;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class MyActivity extends ActionBarActivity {
 
 
     private int currentMonthPosition;
+    private AtomicBoolean mListBeingTouched=new AtomicBoolean(false);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,17 +32,17 @@ public class MyActivity extends ActionBarActivity {
         final MonthAdapter adapter =new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
         adapter.setCurrentMonthPos(adapter.getCount()/2-3);
 
-        ListView month_listview= (ListView) findViewById(R.id.month_listview);
+       final ListView month_listview= (ListView) findViewById(R.id.month_listview);
         month_listview.setAdapter(adapter);
 
         ListView  date_listview= (ListView) findViewById(R.id.date_listview);
-        //date_listview.setAdapter(adapter);
+        date_listview.setAdapter(adapter);
 
         ListView  year_listview= (ListView) findViewById(R.id.year_listview);
         //year_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
                 //"data2","data3","data4","data5","data6","data7","data8"  }));
 
-       // date_listview.setSelection(adapter.getCount()/2);
+        //date_listview.setSelection(adapter.getCount()/2-2);
        //month_listview.setSelection(adapter.getCount()/2);
       //  year_listview.setSelection(adapter.getCount()/2+1);
 
@@ -48,23 +55,52 @@ public class MyActivity extends ActionBarActivity {
 
         //Toast.makeText(this,""+size.x+" "+size.y,Toast.LENGTH_LONG).show();
 
-       month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
+        month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
+        date_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
         month_listview.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                if(!adapter.getAllItemsVisible() && event.getAction() == MotionEvent.ACTION_DOWN){
 
+                    mListBeingTouched.compareAndSet(false,true);
                     adapter.setAllItemsVisible(true);
+                    adapter.highlightCurrentMonthColor(false);
                     adapter.notifyDataSetChanged();
-                    
+
                     return true;
+                }
+
+                if(event.getAction()==MotionEvent.ACTION_UP) {
+
+                    mListBeingTouched.compareAndSet(true,false);
+
                 }
                 return false;
             }
         });
 
+        month_listview.setOnScrollListener(new OnScrollListener() {
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                // TODO Auto-generated method stub
+            }
+
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+                if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !mListBeingTouched.get()) {
+
+                    int visibleChildCount = (month_listview.getLastVisiblePosition() - month_listview.getFirstVisiblePosition()) + 1;
+                    Log.d("rahulraja",""+visibleChildCount);
+
+                }
+
+            }
+        });
+
+
 
     }
+
+
 
 
     @Override

@@ -1,7 +1,6 @@
 package wincal.android.com.wincal;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ public class MonthAdapter extends BaseAdapter{
     private static LayoutInflater inflater = null;
     private int currentMonthPos=0;
     private boolean alIItemsVisible=false;
+    private boolean highlightCurrentMonth=true;
 
     public MonthAdapter(Context context, String[] data) {
         // TODO Auto-generated constructor stub
@@ -33,11 +33,20 @@ public class MonthAdapter extends BaseAdapter{
         this.alIItemsVisible=choice;
     }
 
+    public boolean getAllItemsVisible(){
+
+        return this.alIItemsVisible;
+    }
+
     protected void  setCurrentMonthPos(int pos){
 
         currentMonthPos=pos;
-       // Toast.makeText(context,""+currentMonthPos,Toast.LENGTH_LONG).show();
 
+    }
+
+    protected void highlightCurrentMonthColor(boolean choice){
+
+        highlightCurrentMonth=false;
     }
 
     @Override
@@ -75,7 +84,7 @@ public class MonthAdapter extends BaseAdapter{
         if(!this.alIItemsVisible)
             vi.setVisibility(View.INVISIBLE);
 
-        Log.d("rahulraja",""+this.alIItemsVisible);
+        //Log.d("rahulraja",""+this.alIItemsVisible);
 
        TextView subText = (TextView) vi.findViewById(R.id.sub_text);
        TextView mainText=(TextView)vi.findViewById(R.id.main_text);
@@ -84,7 +93,7 @@ public class MonthAdapter extends BaseAdapter{
         subText.setText(data[actualPosition]);
         mainText.setText(String.valueOf(actualPosition+1));
 
-        if(position==currentMonthPos ){
+        if(position==currentMonthPos && highlightCurrentMonth ){
 
            vi.setVisibility(View.VISIBLE);
             vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
