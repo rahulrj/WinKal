@@ -1,6 +1,7 @@
 package wincal.android.com.wincal;
 
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -106,8 +107,17 @@ public class MyActivity extends ActionBarActivity {
 
         for(int i=firstVisiblePosition;i<=lastVisiblePosition;i++){
 
-                 View v=month_listview.getAdapter().getView(i,null,null);
-                 Log.d("rahulraja", "" + v.getId());
+                 View v=month_listview.getChildAt(i);
+            Log.d("rahul",""+v);
+            Rect rectf = new Rect();
+//            v.getLocalVisibleRect(rectf);
+//
+//            Log.d("WIDTH        :", String.valueOf(rectf.width()));
+//            Log.d("HEIGHT       :", String.valueOf(rectf.height()));
+//            Log.d("left         :", String.valueOf(rectf.left));
+//            Log.d("right        :", String.valueOf(rectf.right));
+//            Log.d("top          :", String.valueOf(rectf.top));
+//            Log.d("bottom       :", String.valueOf(rectf.bottom));
 
         }
 
