@@ -11,8 +11,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.AbsListView;
-import android.widget.ListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.ListView;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,6 +22,7 @@ public class MyActivity extends ActionBarActivity {
 
     private int currentMonthPosition;
     private AtomicBoolean mListBeingTouched=new AtomicBoolean(false);
+    private ListView month_listview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,7 @@ public class MyActivity extends ActionBarActivity {
         final MonthAdapter adapter =new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
         adapter.setCurrentMonthPos(adapter.getCount()/2-3);
 
-       final ListView month_listview= (ListView) findViewById(R.id.month_listview);
+       month_listview= (ListView) findViewById(R.id.month_listview);
         month_listview.setAdapter(adapter);
 
         ListView  date_listview= (ListView) findViewById(R.id.date_listview);
@@ -89,12 +90,26 @@ public class MyActivity extends ActionBarActivity {
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !mListBeingTouched.get()) {
 
                     int visibleChildCount = (month_listview.getLastVisiblePosition() - month_listview.getFirstVisiblePosition()) + 1;
-                    Log.d("rahulraja",""+visibleChildCount);
+                    putSomeRowInMiddle(month_listview.getFirstVisiblePosition(),month_listview.getLastVisiblePosition());
+                    //Log.d("rahulraja",""+visibleChildCount);
 
                 }
 
             }
         });
+
+    }
+
+    private void putSomeRowInMiddle(int firstVisiblePosition,int lastVisiblePosition){
+
+        //Log.d("hey",""+firstVisiblePosition+" "+lastVisiblePosition);
+
+        for(int i=firstVisiblePosition;i<=lastVisiblePosition;i++){
+
+                 View v=month_listview.getAdapter().getView(i,null,null);
+                 Log.d("rahulraja", "" + v.getId());
+
+        }
 
     }
 

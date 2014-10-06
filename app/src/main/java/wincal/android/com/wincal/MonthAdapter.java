@@ -84,7 +84,6 @@ public class MonthAdapter extends BaseAdapter{
         if(!this.alIItemsVisible)
             vi.setVisibility(View.INVISIBLE);
 
-        //Log.d("rahulraja",""+this.alIItemsVisible);
 
        TextView subText = (TextView) vi.findViewById(R.id.sub_text);
        TextView mainText=(TextView)vi.findViewById(R.id.main_text);
