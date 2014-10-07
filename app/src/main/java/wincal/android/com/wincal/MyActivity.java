@@ -1,5 +1,9 @@
 package wincal.android.com.wincal;
 
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -11,9 +15,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,11 +30,27 @@ public class MyActivity extends ActionBarActivity {
     private int currentMonthPosition;
     private AtomicBoolean mListBeingTouched=new AtomicBoolean(false);
     private ListView month_listview;
+    private int mRootLayoutHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(new MyView(this));
         setContentView(R.layout.activity_my);
+
+        final RelativeLayout rootLayout=(RelativeLayout)findViewById(R.id.root_layout);
+        ViewTreeObserver vto = rootLayout.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+
+                rootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                mRootLayoutHeight=rootLayout.getHeight();
+                month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
+
+            }
+        });
+
 
 
         final MonthAdapter adapter =new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
@@ -41,23 +63,16 @@ public class MyActivity extends ActionBarActivity {
         date_listview.setAdapter(adapter);
 
         ListView  year_listview= (ListView) findViewById(R.id.year_listview);
-        //year_listview.setAdapter(new MonthAdapter(this, new String[] { "data1",
-                //"data2","data3","data4","data5","data6","data7","data8"  }));
 
-        //date_listview.setSelection(adapter.getCount()/2-2);
-       //month_listview.setSelection(adapter.getCount()/2);
-      //  year_listview.setSelection(adapter.getCount()/2+1);
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
        int width= display.getWidth()/2;
         int height=display.getHeight()/2;
-        //int width = size.x/2;
-        //int height = size.y/2;
 
-        //Toast.makeText(this,""+size.x+" "+size.y,Toast.LENGTH_LONG).show();
 
-        month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
+
+        //month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
         date_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
         month_listview.setOnTouchListener(new OnTouchListener() {
             @Override
@@ -90,8 +105,8 @@ public class MyActivity extends ActionBarActivity {
 
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !mListBeingTouched.get()) {
 
-                    int visibleChildCount = (month_listview.getLastVisiblePosition() - month_listview.getFirstVisiblePosition()) + 1;
-                    putSomeRowInMiddle(month_listview.getFirstVisiblePosition(),month_listview.getLastVisiblePosition());
+                   // int visibleChildCount = (month_listview.getLastVisiblePosition() - month_listview.getFirstVisiblePosition()) + 1;
+                    putSomeRowInMiddle();
                     //Log.d("rahulraja",""+visibleChildCount);
 
                 }
@@ -99,19 +114,55 @@ public class MyActivity extends ActionBarActivity {
             }
         });
 
+
+
     }
 
-    private void putSomeRowInMiddle(int firstVisiblePosition,int lastVisiblePosition){
+    public class MyView extends View {
+        public MyView(Context context) {
+            super(context);
+            // TODO Auto-generated constructor stub
+        }
 
-        //Log.d("hey",""+firstVisiblePosition+" "+lastVisiblePosition);
+        @Override
+        protected void onDraw(Canvas canvas) {
+            // TODO Auto-generated method stub
+            super.onDraw(canvas);
+            int x = getWidth();
+            int y = getHeight();
+            int radius;
+            radius = 100;
+            Paint paint = new Paint();
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.WHITE);
+            canvas.drawPaint(paint);
+            // Use Color.parseColor to define HTML colors
+            paint.setColor(Color.parseColor("#CD5C5C"));
+            canvas.drawRect(0,800,500,500,paint);
+        }
+    }
 
-        for(int i=firstVisiblePosition;i<=lastVisiblePosition;i++){
+    private void putSomeRowInMiddle(){
+
+        Display display = getWindowManager().getDefaultDisplay();
+        int height=display.getHeight()/2;
+
+        Canvas c=new Canvas();
+        Paint myPaint = new Paint();
+        myPaint.setColor(Color.rgb(0, 0, 0));
+        myPaint.setStrokeWidth(10);
+        c.drawRect(100, 100, 200, 200, myPaint);
+
+        for(int i=0;i<month_listview.getChildCount();i++){
 
                  View v=month_listview.getChildAt(i);
-            Log.d("rahul",""+v);
+            //Log.d("rahul", "" + v.getHeight());
             Rect rectf = new Rect();
-//            v.getLocalVisibleRect(rectf);
-//
+            v.getGlobalVisibleRect(rectf);
+
+            if(rectf.top<=height && rectf.top>=(height-rectf.height()))
+
+                Log.d("hey",""+i);
 //            Log.d("WIDTH        :", String.valueOf(rectf.width()));
 //            Log.d("HEIGHT       :", String.valueOf(rectf.height()));
 //            Log.d("left         :", String.valueOf(rectf.left));
