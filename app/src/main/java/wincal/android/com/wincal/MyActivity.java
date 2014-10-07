@@ -38,6 +38,13 @@ public class MyActivity extends ActionBarActivity {
         //setContentView(new MyView(this));
         setContentView(R.layout.activity_my);
 
+        final MonthAdapter adapter =new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
+        adapter.setCurrentMonthPos(adapter.getCount()/2-3);
+
+        month_listview= (ListView) findViewById(R.id.month_listview);
+        month_listview.setAdapter(adapter);
+
+
         final RelativeLayout rootLayout=(RelativeLayout)findViewById(R.id.root_layout);
         ViewTreeObserver vto = rootLayout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -46,18 +53,16 @@ public class MyActivity extends ActionBarActivity {
 
                 rootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 mRootLayoutHeight=rootLayout.getHeight();
-                month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
+                month_listview.setSelectionFromTop(adapter.getCount()/2-3,mRootLayoutHeight/3);
 
             }
         });
 
 
 
-        final MonthAdapter adapter =new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
-        adapter.setCurrentMonthPos(adapter.getCount()/2-3);
 
-       month_listview= (ListView) findViewById(R.id.month_listview);
-        month_listview.setAdapter(adapter);
+
+
 
         ListView  date_listview= (ListView) findViewById(R.id.date_listview);
         date_listview.setAdapter(adapter);
