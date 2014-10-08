@@ -20,6 +20,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -31,14 +32,16 @@ public class MyActivity extends ActionBarActivity {
     private AtomicBoolean mListBeingTouched=new AtomicBoolean(false);
     private ListView month_listview;
     private int mRootLayoutHeight;
+    private MonthAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(new MyView(this));
-        setContentView(R.layout.activity_my);
 
-        final MonthAdapter adapter =new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
+        setContentView(R.layout.activity_my);
+        //setContentView(new MyView(this));
+
+        adapter =new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
         adapter.setCurrentMonthPos(adapter.getCount()/2-3);
 
         month_listview= (ListView) findViewById(R.id.month_listview);
@@ -54,6 +57,8 @@ public class MyActivity extends ActionBarActivity {
                 rootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 mRootLayoutHeight=rootLayout.getHeight();
                 month_listview.setSelectionFromTop(adapter.getCount()/2-3,mRootLayoutHeight/3);
+                setListeners();
+                putSomeRowInMiddle();
 
             }
         });
@@ -72,13 +77,17 @@ public class MyActivity extends ActionBarActivity {
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
-       int width= display.getWidth()/2;
+        int width= display.getWidth()/2;
         int height=display.getHeight()/2;
-
 
 
         //month_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
         date_listview.setSelectionFromTop(adapter.getCount()/2-2,height);
+
+    }
+
+    private void setListeners(){
+
         month_listview.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -110,8 +119,8 @@ public class MyActivity extends ActionBarActivity {
 
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !mListBeingTouched.get()) {
 
-                   // int visibleChildCount = (month_listview.getLastVisiblePosition() - month_listview.getFirstVisiblePosition()) + 1;
-                    putSomeRowInMiddle();
+                    // int visibleChildCount = (month_listview.getLastVisiblePosition() - month_listview.getFirstVisiblePosition()) + 1;
+                    //putSomeRowInMiddle();
                     //Log.d("rahulraja",""+visibleChildCount);
 
                 }
@@ -143,37 +152,31 @@ public class MyActivity extends ActionBarActivity {
             canvas.drawPaint(paint);
             // Use Color.parseColor to define HTML colors
             paint.setColor(Color.parseColor("#CD5C5C"));
-            canvas.drawRect(0,800,500,500,paint);
+            canvas.drawRect(0,345,500,346,paint);
         }
     }
 
     private void putSomeRowInMiddle(){
 
-        Display display = getWindowManager().getDefaultDisplay();
-        int height=display.getHeight()/2;
-
-        Canvas c=new Canvas();
-        Paint myPaint = new Paint();
-        myPaint.setColor(Color.rgb(0, 0, 0));
-        myPaint.setStrokeWidth(10);
-        c.drawRect(100, 100, 200, 200, myPaint);
-
         for(int i=0;i<month_listview.getChildCount();i++){
 
                  View v=month_listview.getChildAt(i);
+               TextView tv=(TextView)v.findViewById(R.id.sub_text);
             //Log.d("rahul", "" + v.getHeight());
             Rect rectf = new Rect();
             v.getGlobalVisibleRect(rectf);
 
-            if(rectf.top<=height && rectf.top>=(height-rectf.height()))
+            if(true) {
 
-                Log.d("hey",""+i);
-//            Log.d("WIDTH        :", String.valueOf(rectf.width()));
-//            Log.d("HEIGHT       :", String.valueOf(rectf.height()));
-//            Log.d("left         :", String.valueOf(rectf.left));
-//            Log.d("right        :", String.valueOf(rectf.right));
-//            Log.d("top          :", String.valueOf(rectf.top));
-//            Log.d("bottom       :", String.valueOf(rectf.bottom));
+                Log.d("hey", "" + tv.getText());
+            Log.d("WIDTH        :", String.valueOf(rectf.width()));
+            Log.d("HEIGHT       :", String.valueOf(rectf.height()));
+            Log.d("left         :", String.valueOf(rectf.left));
+            Log.d("right        :", String.valueOf(rectf.right));
+            Log.d("top          :", String.valueOf(rectf.top));
+            Log.d("bottom       :", String.valueOf(rectf.bottom));
+
+            }
 
         }
 
