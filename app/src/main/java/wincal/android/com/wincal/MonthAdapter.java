@@ -98,6 +98,8 @@ public class MonthAdapter extends BaseAdapter{
             vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
         }
 
+
+
         return vi;
     }
 }
