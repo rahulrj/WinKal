@@ -90,7 +90,7 @@ public class MyActivity extends ActionBarActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 if(!adapter.getAllItemsVisible() && event.getAction() == MotionEvent.ACTION_DOWN){
 
-                    mListBeingTouched.compareAndSet(false,true);
+                    mListBeingTouched.set(true);
                     adapter.setAllItemsVisible(true);
                     adapter.highlightCurrentMonthColor(false);
                     adapter.notifyDataSetChanged();
@@ -117,7 +117,9 @@ public class MyActivity extends ActionBarActivity {
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !mListBeingTouched.get()) {
 
                     // int visibleChildCount = (month_listview.getLastVisiblePosition() - month_listview.getFirstVisiblePosition()) + 1;
+                    mListBeingTouched.set(true);
                     putSomeRowInMiddle();
+
                     //Log.d("rahulraja",""+visibleChildCount);
 
                 }
@@ -179,9 +181,20 @@ public class MyActivity extends ActionBarActivity {
 //
 
                 //Log.d("rahulraja",""+v.getTop());
-                if(v.getTop()>mRootLayoutHeight/3 && v.getTop()<mRootLayoutHeight/2)
-                    month_listview.setSelectionFromTop(month_listview.getFirstVisiblePosition()+i,mRootLayoutHeight/3);
+                if(v.getTop()>mRootLayoutHeight/3 && v.getTop()<mRootLayoutHeight/2) {
                     Log.d("hey", "" + tv.getText());
+                    Log.d("heyplus",""+v.getTop()+" "+mRootLayoutHeight/3);
+                    month_listview.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
+                }
+
+
+                if(v.getBottom()>=mRootLayoutHeight/2 && v.getBottom()<(mRootLayoutHeight/2+(v.getHeight()/2))) {
+
+                    Log.d("rahulraja",""+tv.getText());
+                    month_listview.smoothScrollBy(v.getBottom() - (mRootLayoutHeight / 2 + (v.getHeight() / 2)), 1000);
+                }
+
+
 //                Log.d("WIDTH        :", String.valueOf(rectf.width()));
 //                Log.d("HEIGHT       :", String.valueOf(rectf.height()));
 //                Log.d("left         :", String.valueOf(rectf.left));
