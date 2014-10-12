@@ -22,6 +22,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -184,7 +186,13 @@ public class MyActivity extends ActionBarActivity {
                 if(v.getTop()>mRootLayoutHeight/3 && v.getTop()<mRootLayoutHeight/2) {
                     Log.d("hey", "" + tv.getText());
                     Log.d("heyplus",""+v.getTop()+" "+mRootLayoutHeight/3);
-                    month_listview.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
+
+                    month_listview.smoothScrollBy(50,1000);
+                   // Toast.makeText(this,"calles",Toast.LENGTH_LONG).show();
+
+                        //month_listview.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
+
+
                 }
 
 
@@ -205,6 +213,17 @@ public class MyActivity extends ActionBarActivity {
             }
 
         }
+
+    }
+
+
+    protected void smoothScrollTheList(){
+
+        ViewTreeObserver vto = month_listview.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+            public void onGlobalLayout() {
+                month_listview.smoothScrollBy(100,1000);
+            }});
 
     }
 
