@@ -52,6 +52,9 @@ public class MyActivity extends ActionBarActivity {
         final ListView  date_listview= (ListView) findViewById(R.id.date_listview);
         date_listview.setAdapter(adapter);
 
+        ListView  year_listview= (ListView) findViewById(R.id.year_listview);
+        year_listview.setAdapter(adapter);
+
 
 
         final RelativeLayout rootLayout=(RelativeLayout)findViewById(R.id.root_layout);
@@ -75,7 +78,7 @@ public class MyActivity extends ActionBarActivity {
 
 
 
-        ListView  year_listview= (ListView) findViewById(R.id.year_listview);
+
 
 
         Display display = getWindowManager().getDefaultDisplay();
