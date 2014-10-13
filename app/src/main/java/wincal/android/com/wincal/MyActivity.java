@@ -181,7 +181,7 @@ public class MyActivity extends ActionBarActivity {
 
                final View v=month_listview.getChildAt(i);
             if(v!=null) {
-                TextView tv = (TextView) v.findViewById(R.id.sub_text);
+                TextView tv = (TextView) v.findViewById(R.id.row_text);
                 //Log.d("rahul", "" + v.getHeight());
 //                Rect rectf = new Rect();
 //                v.getGlobalVisibleRect(rectf);

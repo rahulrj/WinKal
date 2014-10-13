@@ -85,8 +85,8 @@ public class MonthAdapter extends BaseAdapter{
             vi.setVisibility(View.INVISIBLE);
 
 
-       TextView subText = (TextView) vi.findViewById(R.id.sub_text);
-       TextView mainText=(TextView)vi.findViewById(R.id.main_text);
+       TextView subText = (TextView) vi.findViewById(R.id.row_text);
+       TextView mainText=(TextView)vi.findViewById(R.id.row_number);
 
         int actualPosition = position % data.length;
         subText.setText(data[actualPosition]);
