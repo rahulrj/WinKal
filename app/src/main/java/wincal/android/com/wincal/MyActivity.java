@@ -49,6 +49,9 @@ public class MyActivity extends ActionBarActivity {
         month_listview= (ListView) findViewById(R.id.month_listview);
         month_listview.setAdapter(adapter);
 
+        final ListView  date_listview= (ListView) findViewById(R.id.date_listview);
+        date_listview.setAdapter(adapter);
+
 
 
         final RelativeLayout rootLayout=(RelativeLayout)findViewById(R.id.root_layout);
@@ -60,6 +63,7 @@ public class MyActivity extends ActionBarActivity {
                 rootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 mRootLayoutHeight=rootLayout.getMeasuredHeight();
                 month_listview.setSelectionFromTop(adapter.getCount()/2-3,mRootLayoutHeight/3);
+                date_listview.setSelectionFromTop(adapter.getCount()/2-3,mRootLayoutHeight/3);
                 setListeners();
                 Toast.makeText(MyActivity.this,""+mRootLayoutHeight,Toast.LENGTH_LONG).show();
                  //putSomeRowInMiddle();
@@ -69,8 +73,7 @@ public class MyActivity extends ActionBarActivity {
         });
 
 
-        ListView  date_listview= (ListView) findViewById(R.id.date_listview);
-        date_listview.setAdapter(adapter);
+
 
         ListView  year_listview= (ListView) findViewById(R.id.year_listview);
 
@@ -173,7 +176,7 @@ public class MyActivity extends ActionBarActivity {
         for(int i = 0; i <= month_listview.getLastVisiblePosition() - month_listview.getFirstVisiblePosition(); i++){
 
 
-               View v=month_listview.getChildAt(i);
+               final View v=month_listview.getChildAt(i);
             if(v!=null) {
                 TextView tv = (TextView) v.findViewById(R.id.sub_text);
                 //Log.d("rahul", "" + v.getHeight());
@@ -183,11 +186,19 @@ public class MyActivity extends ActionBarActivity {
 //
 
                 //Log.d("rahulraja",""+v.getTop());
-                if(v.getTop()>mRootLayoutHeight/3 && v.getTop()<mRootLayoutHeight/2) {
+                if(v.getTop()>mRootLayoutHeight/3 && v.getTop()<(mRootLayoutHeight/3+v.getHeight()/2)) {
                     Log.d("hey", "" + tv.getText());
                     Log.d("heyplus",""+v.getTop()+" "+mRootLayoutHeight/3);
 
-                    month_listview.smoothScrollBy(50,1000);
+                    month_listview.post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            month_listview.smoothScrollBy(v.getTop()-mRootLayoutHeight/3,1000);
+                        }
+                    });
+
+
                    // Toast.makeText(this,"calles",Toast.LENGTH_LONG).show();
 
                         //month_listview.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);

@@ -30,6 +30,7 @@
         android:id="@+id/date_listview"
         android:dividerHeight="8dp"
         android:scrollbars="none"
+        android:divider="@android:color/transparent"
         android:layout_toEndOf="@+id/month_listview"
         android:layout_marginLeft="8dp"
         android:layout_weight="1"
