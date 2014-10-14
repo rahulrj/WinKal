@@ -16,36 +16,39 @@
     <ListView
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:id="@+id/month_listview"
-        android:dividerHeight="@dimen/listview_divider_height"
-        android:divider="@android:color/transparent"
-        android:scrollbars="none"
-        android:layout_marginLeft="@dimen/listview_left_margin"
         android:layout_weight="1"
-        ></ListView>
+        android:id="@+id/month_listview"
+        android:scrollbars="none"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="@dimen/listview_divider_height"
+       android:layout_marginLeft="@dimen/listview_left_margin"
+         ></ListView>
 
     <ListView
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:id="@+id/date_listview"
-        android:dividerHeight="@dimen/listview_divider_height"
         android:scrollbars="none"
         android:divider="@android:color/transparent"
+        android:dividerHeight="@dimen/listview_divider_height"
         android:layout_toEndOf="@+id/month_listview"
         android:layout_marginLeft="@dimen/listview_left_margin"
-        android:layout_weight="1"
+
         ></ListView>
 
     <ListView
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:id="@+id/year_listview"
-        android:dividerHeight="@dimen/listview_divider_height"
         android:scrollbars="none"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="@dimen/listview_divider_height"
         android:layout_toEndOf="@+id/date_listview"
         android:layout_marginLeft="@dimen/listview_left_margin"
         android:layout_marginRight="@dimen/listview_right_margin"
-        android:layout_weight="1"
+
         ></ListView>
 
     </LinearLayout>
