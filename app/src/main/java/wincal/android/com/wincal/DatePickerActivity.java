@@ -19,8 +19,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DatePickerActivity extends ActionBarActivity {
 
 
-    private ListView mMonth_listview;
+    private ListView mMonthListview;
+    private ListView mDateListView;
     private MonthAdapter mMonthAdapter;
+
+    private int mMiddlePositionInScreen=0;
+    private int mBottomPositionOfMiddleElement=0;
 
 
     private int currentMonthPosition;
@@ -37,8 +41,11 @@ public class DatePickerActivity extends ActionBarActivity {
         mMonthAdapter = new MonthAdapter(this, getResources().getStringArray(R.array.month_names));
         mMonthAdapter.setCurrentMonthPos(mMonthAdapter.getCount() / 2 - 3);
 
-        mMonth_listview = (ListView) findViewById(R.id.month_listview);
-        mMonth_listview.setAdapter(mMonthAdapter);
+        mMonthListview = (ListView) findViewById(R.id.month_listview);
+        mMonthListview.setAdapter(mMonthAdapter);
+
+       mDateListView = (ListView) findViewById(R.id.date_listview);
+       mDateListView.setAdapter(mMonthAdapter);
 
 
         final RelativeLayout rootLayout = (RelativeLayout) findViewById(R.id.root_layout);
@@ -49,7 +56,9 @@ public class DatePickerActivity extends ActionBarActivity {
 
                 rootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 mRootLayoutHeight = rootLayout.getMeasuredHeight();
-                mMonth_listview.setSelectionFromTop(mMonthAdapter.getCount() / 2 - 3, mRootLayoutHeight / 3);
+                mMonthListview.setSelectionFromTop(mMonthAdapter.getCount() / 2 - 3, mRootLayoutHeight / 3);
+                mDateListView.setSelectionFromTop(mMonthAdapter.getCount() / 2 - 3, mRootLayoutHeight / 3);
+
                 setListenersOnMonthView();
 
 
@@ -61,40 +70,43 @@ public class DatePickerActivity extends ActionBarActivity {
 
     private void setListenersOnMonthView() {
 
-        mMonth_listview.setOnTouchListener(new OnTouchListener() {
+        mMonthListview.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (!mMonthAdapter.getAllItemsVisible() && event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                    mListBeingTouched.set(true);
-                    mMonthAdapter.setAllItemsVisible(true);
-                    mMonthAdapter.highlightCurrentMonthColor(false);
-                    mMonthAdapter.notifyDataSetChanged();
+                    if (!mMonthAdapter.getAllItemsVisible()) {
+                        mListBeingTouched.set(true);
+                        mMonthAdapter.setAllItemsVisible(true);
+                        mMonthAdapter.highlightCurrentMonthColor(false);
+                        mMonthAdapter.notifyDataSetChanged();
+                    } else if (mMonthAdapter.getAllItemsVisible()) {
+                        mListBeingTouched.set(true);
+                    }
 
-                    return true;
+                    //return true;
                 }
 
                 if (event.getAction() == MotionEvent.ACTION_UP) {
 
                     mListBeingTouched.compareAndSet(true, false);
+                    // return true;
 
                 }
                 return false;
             }
         });
 
-        mMonth_listview.setOnScrollListener(new OnScrollListener() {
+        mMonthListview.setOnScrollListener(new OnScrollListener() {
 
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             }
 
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !mListBeingTouched.get()) {
 
                     mListBeingTouched.set(true);
                     putSomeRowInMiddle();
-
 
                 }
 
@@ -107,26 +119,68 @@ public class DatePickerActivity extends ActionBarActivity {
 
     private void putSomeRowInMiddle() {
 
-        for (int i = 0; i <= mMonth_listview.getLastVisiblePosition() - mMonth_listview.getFirstVisiblePosition(); i++) {
-            final View v = mMonth_listview.getChildAt(i);
+        for (int i = 0; i <= mMonthListview.getLastVisiblePosition() - mMonthListview.getFirstVisiblePosition(); i++) {
+            final View v = mMonthListview.getChildAt(i);
             if (v != null) {
-                if (v.getTop() > mRootLayoutHeight / 3 && v.getTop() < (mRootLayoutHeight / 3 + v.getHeight() / 2)) {
-                    mMonth_listview.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mMonth_listview.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
-                        }
-                    });
+
+                if(mMiddlePositionInScreen == 0 ) {
+                    mMiddlePositionInScreen = mRootLayoutHeight / 3 + v.getHeight() / 2;
+                    mBottomPositionOfMiddleElement=mRootLayoutHeight/3+v.getHeight();
+                }
+
+                if ((v.getTop() > mRootLayoutHeight / 3) && v.getTop() < mMiddlePositionInScreen) {
+                          scrollUp(v);
+                }
+
+                if ((v.getBottom() >= mMiddlePositionInScreen) && v.getBottom() < mBottomPositionOfMiddleElement) {
+                         scrollDown(v);
+                }
+
+
+                if(v.getBottom()<=mMiddlePositionInScreen && v.getBottom()>mRootLayoutHeight/3){
+
+                       if(v.getBottom()+ mMonthListview.getDividerHeight()/2>=mMiddlePositionInScreen){
+                              scrollDown(v);
+                       }
 
                 }
 
-                if (v.getBottom() >= mRootLayoutHeight / 2 && v.getBottom() < (mRootLayoutHeight / 2 + (v.getHeight() / 2))) {
-                    mMonth_listview.smoothScrollBy(v.getBottom() - (mRootLayoutHeight / 2 + (v.getHeight() / 2)), 1000);
+                if(v.getTop()>=mMiddlePositionInScreen && v.getTop()<mBottomPositionOfMiddleElement){
+
+                    if(v.getTop()- mMonthListview.getDividerHeight()/2<=mMiddlePositionInScreen){
+                              scrollUp(v);
+                    }
+
                 }
+
 
             }
 
         }
+
+    }
+
+    private void scrollDown(final View v){
+
+        mMonthListview.post(new Runnable() {
+            @Override
+            public void run() {
+                mMonthListview.smoothScrollBy(v.getBottom() - (mRootLayoutHeight / 3 + v.getHeight()), 1000);
+
+            }
+        });
+
+    }
+
+
+    private void scrollUp(final View v){
+
+        mMonthListview.post(new Runnable() {
+            @Override
+            public void run() {
+                mMonthListview.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
+            }
+        });
 
     }
 

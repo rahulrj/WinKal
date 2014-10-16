@@ -7,6 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.IllegalFormatConversionException;
+import java.util.IllegalFormatException;
+import java.util.Locale;
+
 /**
  * Created by Rahul Raja on 9/25/2014.
  */
@@ -90,7 +94,18 @@ public class MonthAdapter extends BaseAdapter{
 
         int actualPosition = position % data.length;
         subText.setText(data[actualPosition]);
-        mainText.setText(String.valueOf(actualPosition+1));
+
+        try {
+            mainText.setText(String.format(Locale.ENGLISH, "%02d", (actualPosition + 1)));
+        }catch(IllegalFormatConversionException e){
+
+            mainText.setText(String.valueOf(actualPosition+1));
+        }
+        catch(IllegalFormatException e){
+
+            mainText.setText(String.valueOf(actualPosition+1));
+        }
+
 
         if(position==currentMonthPos && highlightCurrentMonth ){
 
