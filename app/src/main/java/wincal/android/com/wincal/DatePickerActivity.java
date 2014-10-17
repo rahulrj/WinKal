@@ -2,6 +2,7 @@ package wincal.android.com.wincal;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -15,6 +16,7 @@ import android.widget.RelativeLayout;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -26,6 +28,7 @@ public class DatePickerActivity extends ActionBarActivity {
     private ListView mYearListView;
     private MonthYearAdapter mMonthAdapter;
     private MonthYearAdapter mYearAdapter;
+    private MonthYearAdapter mDateAdapter;
 
     private int mMiddlePositionInScreen=0;
     private int mBottomPositionOfMiddleElement=0;
@@ -33,6 +36,8 @@ public class DatePickerActivity extends ActionBarActivity {
     private int mCurrentYear;
     private int mCurrentYearPosition;
     private int mCurrentMonthPosition;
+
+    private String[] daysOfTheMonth;
 
 
     private int currentMonthPosition;
@@ -46,20 +51,24 @@ public class DatePickerActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.date_picker);
+        getCurrentDate();
+        findCalendarForCurrentMonth();
 
         mMonthListview = (ListView) findViewById(R.id.month_listview);
         mDateListView = (ListView) findViewById(R.id.date_listview);
         mYearListView = (ListView) findViewById(R.id.year_listview);
 
         String monthNames[]=getResources().getStringArray(R.array.month_names);
-        mMonthAdapter = new MonthYearAdapter(this,monthNames,monthNames.length);
+        mMonthAdapter = new MonthYearAdapter(this,monthNames,monthNames.length,Constants.NOT_FOR_DATE_VIEW);
+        mMonthAdapter.setAllItemsVisible(true);
 
 
-        mYearAdapter = new MonthYearAdapter(this, null,Constants.NO_OF_YEARS);
-        //mYearAdapter.setCurrentMonthPos(mYearAdapter.getCount() / 2 - 3);
+        mYearAdapter = new MonthYearAdapter(this, null,Constants.NO_OF_YEARS,Constants.NOT_FOR_DATE_VIEW);
+        mDateAdapter = new MonthYearAdapter(this, daysOfTheMonth,daysOfTheMonth.length,Constants.FOR_DATE_VIEW);
 
         mMonthListview.setAdapter(mMonthAdapter);
         mYearListView.setAdapter(mYearAdapter);
+        mDateListView.setAdapter(mDateAdapter);
 
         setCurrentPositionsInListViews();
 
@@ -87,7 +96,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
     }
 
-    private void setCurrentPositionsInListViews(){
+    private void getCurrentDate(){
 
         Date currentDate=new Date();
         Calendar cal=Calendar.getInstance();
@@ -95,6 +104,28 @@ public class DatePickerActivity extends ActionBarActivity {
 
         mCurrentMonth=cal.get(Calendar.MONTH);
         mCurrentYear=cal.get(Calendar.YEAR);
+
+    }
+
+    private void findCalendarForCurrentMonth(){
+
+        Calendar cal=new GregorianCalendar();
+        cal.clear();
+        cal.set(mCurrentYear,mCurrentMonth-1,1);
+
+        int firstWeekDayOfMonth=cal.get(Calendar.DAY_OF_WEEK);
+        int numberOfMonthDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+
+        daysOfTheMonth=new String[numberOfMonthDays+1];
+        for(int i=1;i<=numberOfMonthDays;i++){
+
+                daysOfTheMonth[i]=String.valueOf(i);
+        }
+
+    }
+
+    private void setCurrentPositionsInListViews(){
 
         mCurrentMonthPosition=mMonthAdapter.getCount()/2-Constants.OFFSET_FOR_MONTH+mCurrentMonth;
         mCurrentYearPosition=mYearAdapter.getCount()/2-Constants.OFFSET_FOR_YEAR+(mCurrentYear-Constants.STARTING_YEAR);
@@ -116,8 +147,11 @@ public class DatePickerActivity extends ActionBarActivity {
                         adapter.setAllItemsVisible(true);
                         adapter.highlightCurrentMonthColor(false);
                         adapter.notifyDataSetChanged();
-                    } else if (adapter.getAllItemsVisible()) {
+
+                    } else if (adapter.getAllItemsVisible() && adapter.getHighlightCurrentMonth()) {
                         listBeingTouched.set(true);
+                        adapter.highlightCurrentMonthColor(false);
+                        adapter.notifyDataSetChanged();
                     }
 
                     //return true;

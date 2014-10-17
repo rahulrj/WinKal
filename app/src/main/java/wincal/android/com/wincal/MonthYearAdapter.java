@@ -23,11 +23,13 @@ public class MonthYearAdapter extends BaseAdapter{
     private boolean alIItemsVisible=false;
     private boolean highlightCurrentMonth=true;
     private int dataLength=0;
+    private boolean isForDateView=false;
 
-    public MonthYearAdapter(Context context, String[] data,int length) {
+    public MonthYearAdapter(Context context, String[] data,int length,boolean forDateView) {
         // TODO Auto-generated constructor stub
         this.context = context;
         this.data = data;
+        this.isForDateView=forDateView;
         if(data!=null)
             this.dataLength=data.length;
         else
@@ -36,6 +38,11 @@ public class MonthYearAdapter extends BaseAdapter{
         inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+    }
+
+    public boolean getHighlightCurrentMonth(){
+
+        return this.highlightCurrentMonth;
     }
 
     protected void setAllItemsVisible(boolean choice){
@@ -90,9 +97,9 @@ public class MonthYearAdapter extends BaseAdapter{
             vi.setBackgroundResource(R.drawable.list_border);
         }
 
-//        if(!this.alIItemsVisible)
-//            vi.setVisibility(View.INVISIBLE);
 
+        if(!this.alIItemsVisible)
+            vi.setVisibility(View.INVISIBLE);
 
        TextView subText = (TextView) vi.findViewById(R.id.row_text);
        TextView mainText=(TextView)vi.findViewById(R.id.row_number);
@@ -126,8 +133,8 @@ public class MonthYearAdapter extends BaseAdapter{
 
         if(position==currentMonthPos && highlightCurrentMonth ){
 
-           //vi.setVisibility(View.VISIBLE);
-           // vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
+          vi.setVisibility(View.VISIBLE);
+           vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
         }
 
 
