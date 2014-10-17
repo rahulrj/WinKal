@@ -14,7 +14,7 @@ import java.util.Locale;
 /**
  * Created by Rahul Raja on 9/25/2014.
  */
-public class MonthAdapter extends BaseAdapter{
+public class MonthYearAdapter extends BaseAdapter{
 
     Context context;
     String[] data;
@@ -22,11 +22,17 @@ public class MonthAdapter extends BaseAdapter{
     private int currentMonthPos=0;
     private boolean alIItemsVisible=false;
     private boolean highlightCurrentMonth=true;
+    private int dataLength=0;
 
-    public MonthAdapter(Context context, String[] data) {
+    public MonthYearAdapter(Context context, String[] data,int length) {
         // TODO Auto-generated constructor stub
         this.context = context;
         this.data = data;
+        if(data!=null)
+            this.dataLength=data.length;
+        else
+            this.dataLength=length;
+
         inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -55,15 +61,14 @@ public class MonthAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        // TODO Auto-generated method stub
+
         return Integer.MAX_VALUE;
     }
 
     @Override
     public Object getItem(int position) {
-        // TODO Auto-generated method stub
 
-        int actualPosition = position % data.length;
+        int actualPosition=position%dataLength;
         return data[actualPosition];
     }
 
@@ -85,32 +90,44 @@ public class MonthAdapter extends BaseAdapter{
             vi.setBackgroundResource(R.drawable.list_border);
         }
 
-        if(!this.alIItemsVisible)
-            vi.setVisibility(View.INVISIBLE);
+//        if(!this.alIItemsVisible)
+//            vi.setVisibility(View.INVISIBLE);
 
 
        TextView subText = (TextView) vi.findViewById(R.id.row_text);
        TextView mainText=(TextView)vi.findViewById(R.id.row_number);
 
-        int actualPosition = position % data.length;
-        subText.setText(data[actualPosition]);
+        int actualPosition= position % dataLength;
 
-        try {
-            mainText.setText(String.format(Locale.ENGLISH, "%02d", (actualPosition + 1)));
-        }catch(IllegalFormatConversionException e){
+        if(data!=null){
 
-            mainText.setText(String.valueOf(actualPosition+1));
+            subText.setText(data[actualPosition]);
+
+            try {
+                mainText.setText(String.format(Locale.ENGLISH, "%02d", (actualPosition + 1)));
+            }catch(IllegalFormatConversionException e){
+
+                mainText.setText(String.valueOf(actualPosition+1));
+            }
+            catch(IllegalFormatException e){
+
+                mainText.setText(String.valueOf(actualPosition+1));
+            }
+
+
         }
-        catch(IllegalFormatException e){
 
-            mainText.setText(String.valueOf(actualPosition+1));
+        else{
+
+            mainText.setText(String.valueOf(Constants.STARTING_YEAR+actualPosition));
         }
+
 
 
         if(position==currentMonthPos && highlightCurrentMonth ){
 
-           vi.setVisibility(View.VISIBLE);
-            vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
+           //vi.setVisibility(View.VISIBLE);
+           // vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
         }
 
 
