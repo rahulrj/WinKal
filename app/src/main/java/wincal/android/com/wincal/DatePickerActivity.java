@@ -168,7 +168,7 @@ public class DatePickerActivity extends ActionBarActivity {
                             listBeingTouched.set(true);
                             adapter.setAllItemsVisible(true);
                             adapter.highlightCurrentMonthColor(false);
-                            adapter.notifyDataSetChanged();
+                            //adapter.notifyDataSetChanged();
 
                         } else if (adapter.getAllItemsVisible() && adapter.getHighlightCurrentMonth()) {
                             listBeingTouched.set(true);
@@ -176,6 +176,9 @@ public class DatePickerActivity extends ActionBarActivity {
                             adapter.notifyDataSetChanged();
                         }
 
+                    }
+                    else if(mScrollStateOfListView==OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
+                        listBeingTouched.set(true);
                     }
 
                     //return true;
@@ -186,7 +189,7 @@ public class DatePickerActivity extends ActionBarActivity {
                     if(mScrollStateOfListView==OnScrollListener.SCROLL_STATE_IDLE) {
                         listBeingTouched.compareAndSet(true, false);
                         adapter.highlightCurrentMonthColor(true);
-                        adapter.notifyDataSetChanged();
+                        //adapter.notifyDataSetChanged();
                     }
 
                     else if(mScrollStateOfListView==OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
@@ -210,7 +213,6 @@ public class DatePickerActivity extends ActionBarActivity {
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
                 mScrollStateOfListView=scrollState;
-                Log.d("rahulraja",""+listBeingTouched.get());
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get()) {
                     listBeingTouched.set(true);
                     putSomeRowInMiddle(listView,adapter);
