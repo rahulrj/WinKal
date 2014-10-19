@@ -7,9 +7,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.IllegalFormatConversionException;
 import java.util.IllegalFormatException;
 import java.util.Locale;
+import java.text.DateFormat;
 
 /**
  * Created by Rahul Raja on 9/25/2014.
@@ -24,6 +29,10 @@ public class MonthYearAdapter extends BaseAdapter{
     private boolean highlightCurrentMonth=true;
     private int dataLength=0;
     private boolean isForDateView=false;
+
+    private int mCurrentMonth;
+    private int mCurrentYear;
+
 
     public MonthYearAdapter(Context context, String[] data,int length,boolean forDateView) {
         // TODO Auto-generated constructor stub
@@ -66,6 +75,16 @@ public class MonthYearAdapter extends BaseAdapter{
         highlightCurrentMonth=false;
     }
 
+    protected void setCurrentMonth(int currentMonth){
+
+        this.mCurrentMonth=currentMonth;
+    }
+
+    protected void setCurrentYear(int currentYear){
+
+        this.mCurrentYear=currentYear;
+    }
+
     @Override
     public int getCount() {
 
@@ -98,8 +117,8 @@ public class MonthYearAdapter extends BaseAdapter{
         }
 
 
-        if(!this.alIItemsVisible)
-            vi.setVisibility(View.INVISIBLE);
+//        if(!this.alIItemsVisible)
+//            vi.setVisibility(View.INVISIBLE);
 
        TextView subText = (TextView) vi.findViewById(R.id.row_text);
        TextView mainText=(TextView)vi.findViewById(R.id.row_number);
@@ -137,6 +156,16 @@ public class MonthYearAdapter extends BaseAdapter{
            vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
         }
 
+        if (isForDateView){
+
+            Calendar cal=new GregorianCalendar(mCurrentYear,mCurrentMonth,Integer.valueOf(mainText.getText().toString()));
+            Date date=cal.getTime();
+            DateFormat format2=new SimpleDateFormat("EEEE");
+            String dayOfTheWeek=format2.format(date);
+            subText.setText(dayOfTheWeek);
+
+
+        }
 
 
         return vi;

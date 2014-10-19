@@ -2,7 +2,6 @@ package wincal.android.com.wincal;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -62,9 +61,10 @@ public class DatePickerActivity extends ActionBarActivity {
         mMonthAdapter = new MonthYearAdapter(this,monthNames,monthNames.length,Constants.NOT_FOR_DATE_VIEW);
         mMonthAdapter.setAllItemsVisible(true);
 
-
         mYearAdapter = new MonthYearAdapter(this, null,Constants.NO_OF_YEARS,Constants.NOT_FOR_DATE_VIEW);
         mDateAdapter = new MonthYearAdapter(this, daysOfTheMonth,daysOfTheMonth.length,Constants.FOR_DATE_VIEW);
+        mDateAdapter.setCurrentMonth(mCurrentMonth);
+        mDateAdapter.setCurrentYear(mCurrentYear);
 
         mMonthListview.setAdapter(mMonthAdapter);
         mYearListView.setAdapter(mYearAdapter);
@@ -105,6 +105,8 @@ public class DatePickerActivity extends ActionBarActivity {
         mCurrentMonth=cal.get(Calendar.MONTH);
         mCurrentYear=cal.get(Calendar.YEAR);
 
+
+
     }
 
     private void findCalendarForCurrentMonth(){
@@ -113,9 +115,8 @@ public class DatePickerActivity extends ActionBarActivity {
         cal.clear();
         cal.set(mCurrentYear,mCurrentMonth-1,1);
 
-        int firstWeekDayOfMonth=cal.get(Calendar.DAY_OF_WEEK);
+       // mFirstWeekDayOfMonth=cal.get(Calendar.DAY_OF_WEEK);
         int numberOfMonthDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-
 
         daysOfTheMonth=new String[numberOfMonthDays+1];
         for(int i=1;i<=numberOfMonthDays;i++){
@@ -198,7 +199,7 @@ public class DatePickerActivity extends ActionBarActivity {
                     mBottomPositionOfMiddleElement=mRootLayoutHeight/3+v.getHeight();
                 }
 
-                if ((v.getTop() > mRootLayoutHeight / 3) && v.getTop() < mMiddlePositionInScreen) {
+                if ((v.getTop() >= mRootLayoutHeight / 3) && v.getTop() < mMiddlePositionInScreen) {
                           scrollUp(v,listView);
                 }
 
