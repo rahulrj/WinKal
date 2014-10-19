@@ -2,6 +2,7 @@ package wincal.android.com.wincal;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -33,8 +34,14 @@ public class DatePickerActivity extends ActionBarActivity {
     private int mBottomPositionOfMiddleElement=0;
     private int mCurrentMonth;
     private int mCurrentYear;
+    private int mCurrentDate;
     private int mCurrentYearPosition;
     private int mCurrentMonthPosition;
+    private int mCurrentDatePosition;
+
+
+    private int mOffsetForDate;
+    private int mNumberOfMonthDays;
 
     private String[] daysOfTheMonth;
 
@@ -42,7 +49,9 @@ public class DatePickerActivity extends ActionBarActivity {
     private int currentMonthPosition;
     private AtomicBoolean mMonthListBeingTouched = new AtomicBoolean(false);
     private AtomicBoolean mYearListBeingTouched = new AtomicBoolean(false);
+    private AtomicBoolean mDateListBeingTouched = new AtomicBoolean(false);
     private int mRootLayoutHeight;
+    private int mScrollStateOfListView;
 
 
     @Override
@@ -65,6 +74,8 @@ public class DatePickerActivity extends ActionBarActivity {
         mDateAdapter = new MonthYearAdapter(this, daysOfTheMonth,daysOfTheMonth.length,Constants.FOR_DATE_VIEW);
         mDateAdapter.setCurrentMonth(mCurrentMonth);
         mDateAdapter.setCurrentYear(mCurrentYear);
+        mYearAdapter.setAllItemsVisible(false);
+        mDateAdapter.setAllItemsVisible(false);
 
         mMonthListview.setAdapter(mMonthAdapter);
         mYearListView.setAdapter(mYearAdapter);
@@ -83,9 +94,11 @@ public class DatePickerActivity extends ActionBarActivity {
 
                 mMonthListview.setSelectionFromTop(mCurrentMonthPosition, mRootLayoutHeight / 3);
                 mYearListView.setSelectionFromTop(mCurrentYearPosition , mRootLayoutHeight / 3);
+                mDateListView.setSelectionFromTop(mCurrentDatePosition,mRootLayoutHeight/3);
 
-                setListenersOnListView(mMonthAdapter, mMonthListview,mMonthListBeingTouched);
+                setListenersOnListView(mMonthAdapter, mMonthListview, mMonthListBeingTouched);
                 setListenersOnListView(mYearAdapter, mYearListView,mYearListBeingTouched);
+                setListenersOnListView(mDateAdapter, mDateListView,mDateListBeingTouched);
 
 
             }
@@ -104,7 +117,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
         mCurrentMonth=cal.get(Calendar.MONTH);
         mCurrentYear=cal.get(Calendar.YEAR);
-
+        mCurrentDate=cal.get(Calendar.DAY_OF_MONTH);
 
 
     }
@@ -116,10 +129,10 @@ public class DatePickerActivity extends ActionBarActivity {
         cal.set(mCurrentYear,mCurrentMonth-1,1);
 
        // mFirstWeekDayOfMonth=cal.get(Calendar.DAY_OF_WEEK);
-        int numberOfMonthDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        mNumberOfMonthDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        daysOfTheMonth=new String[numberOfMonthDays+1];
-        for(int i=1;i<=numberOfMonthDays;i++){
+        daysOfTheMonth=new String[mNumberOfMonthDays+1];
+        for(int i=1;i<=mNumberOfMonthDays;i++){
 
                 daysOfTheMonth[i]=String.valueOf(i);
         }
@@ -130,8 +143,13 @@ public class DatePickerActivity extends ActionBarActivity {
 
         mCurrentMonthPosition=mMonthAdapter.getCount()/2-Constants.OFFSET_FOR_MONTH+mCurrentMonth;
         mCurrentYearPosition=mYearAdapter.getCount()/2-Constants.OFFSET_FOR_YEAR+(mCurrentYear-Constants.STARTING_YEAR);
-        mMonthAdapter.setCurrentMonthPos(mCurrentMonthPosition);
-        mYearAdapter.setCurrentMonthPos(mCurrentYearPosition);
+
+        mOffsetForDate= findOffsetForDate(mNumberOfMonthDays+1);
+        mCurrentDatePosition=mDateAdapter.getCount()/2-mOffsetForDate+mCurrentDate-1;
+
+        mMonthAdapter.setCurrentPos(mCurrentMonthPosition);
+        mYearAdapter.setCurrentPos(mCurrentYearPosition);
+        mDateAdapter.setCurrentPos(mCurrentDatePosition);
 
 
     }
@@ -141,18 +159,23 @@ public class DatePickerActivity extends ActionBarActivity {
         listView.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if(mScrollStateOfListView==OnScrollListener.SCROLL_STATE_IDLE) {
 
-                    if (!adapter.getAllItemsVisible()) {
-                        listBeingTouched.set(true);
-                        adapter.setAllItemsVisible(true);
-                        adapter.highlightCurrentMonthColor(false);
-                        adapter.notifyDataSetChanged();
+                        setOtherListViewsInvisible(listView);
+                        if (!adapter.getAllItemsVisible()) {
+                            listBeingTouched.set(true);
+                            adapter.setAllItemsVisible(true);
+                            adapter.highlightCurrentMonthColor(false);
+                            adapter.notifyDataSetChanged();
 
-                    } else if (adapter.getAllItemsVisible() && adapter.getHighlightCurrentMonth()) {
-                        listBeingTouched.set(true);
-                        adapter.highlightCurrentMonthColor(false);
-                        adapter.notifyDataSetChanged();
+                        } else if (adapter.getAllItemsVisible() && adapter.getHighlightCurrentMonth()) {
+                            listBeingTouched.set(true);
+                            adapter.highlightCurrentMonthColor(false);
+                            adapter.notifyDataSetChanged();
+                        }
+
                     }
 
                     //return true;
@@ -160,7 +183,17 @@ public class DatePickerActivity extends ActionBarActivity {
 
                 if (event.getAction() == MotionEvent.ACTION_UP) {
 
-                    listBeingTouched.compareAndSet(true, false);
+                    if(mScrollStateOfListView==OnScrollListener.SCROLL_STATE_IDLE) {
+                        listBeingTouched.compareAndSet(true, false);
+                        adapter.highlightCurrentMonthColor(true);
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    else if(mScrollStateOfListView==OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
+
+                        listBeingTouched.compareAndSet(true,false);
+                    }
+
                     // return true;
 
                 }
@@ -168,16 +201,19 @@ public class DatePickerActivity extends ActionBarActivity {
             }
         });
 
+
         listView.setOnScrollListener(new OnScrollListener() {
 
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             }
 
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-                if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get()) {
 
+                mScrollStateOfListView=scrollState;
+                Log.d("rahulraja",""+listBeingTouched.get());
+                if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get()) {
                     listBeingTouched.set(true);
-                    putSomeRowInMiddle(listView);
+                    putSomeRowInMiddle(listView,adapter);
 
                 }
 
@@ -188,7 +224,48 @@ public class DatePickerActivity extends ActionBarActivity {
     }
 
 
-    private void putSomeRowInMiddle(ListView listView) {
+    private void setOtherListViewsInvisible(ListView listView){
+
+        if(listView.getId()==R.id.month_listview){
+
+            if(mYearAdapter.getAllItemsVisible()){
+               makeAllItemsInvisible(mYearAdapter);
+            }
+            if(mDateAdapter.getAllItemsVisible()){
+                makeAllItemsInvisible(mDateAdapter);
+            }
+        }
+
+        else if(listView.getId()==R.id.year_listview){
+
+            if(mMonthAdapter.getAllItemsVisible()){
+                makeAllItemsInvisible(mMonthAdapter);
+            }
+            if(mDateAdapter.getAllItemsVisible()){
+                makeAllItemsInvisible(mDateAdapter);
+            }
+        }
+
+        else if(listView.getId()==R.id.date_listview){
+
+            if(mMonthAdapter.getAllItemsVisible()){
+                makeAllItemsInvisible(mMonthAdapter);
+            }
+            if(mYearAdapter.getAllItemsVisible()){
+                makeAllItemsInvisible(mYearAdapter);
+            }
+        }
+
+    }
+
+
+    private void makeAllItemsInvisible(MonthYearAdapter adapter){
+
+        adapter.setAllItemsVisible(false);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void putSomeRowInMiddle(ListView listView,MonthYearAdapter adapter) {
 
         for (int i = 0; i <= listView.getLastVisiblePosition() - listView.getFirstVisiblePosition(); i++) {
             final View v = listView.getChildAt(i);
@@ -200,18 +277,18 @@ public class DatePickerActivity extends ActionBarActivity {
                 }
 
                 if ((v.getTop() >= mRootLayoutHeight / 3) && v.getTop() < mMiddlePositionInScreen) {
-                          scrollUp(v,listView);
+                          scrollUp(v,listView,adapter,listView.getFirstVisiblePosition()+i);
                 }
 
                 if ((v.getBottom() >= mMiddlePositionInScreen) && v.getBottom() < mBottomPositionOfMiddleElement) {
-                         scrollDown(v,listView);
+                         scrollDown(v,listView,adapter,listView.getFirstVisiblePosition()+i);
                 }
 
 
                 if(v.getBottom()<=mMiddlePositionInScreen && v.getBottom()>mRootLayoutHeight/3){
 
                        if(v.getBottom()+ listView.getDividerHeight()/2>=mMiddlePositionInScreen){
-                              scrollDown(v,listView);
+                              scrollDown(v,listView,adapter,listView.getFirstVisiblePosition()+i);
                        }
 
                 }
@@ -219,7 +296,7 @@ public class DatePickerActivity extends ActionBarActivity {
                 if(v.getTop()>=mMiddlePositionInScreen && v.getTop()<mBottomPositionOfMiddleElement){
 
                     if(v.getTop()- listView.getDividerHeight()/2<=mMiddlePositionInScreen){
-                              scrollUp(v,listView);
+                              scrollUp(v,listView,adapter,listView.getFirstVisiblePosition()+i);
                     }
 
                 }
@@ -231,12 +308,13 @@ public class DatePickerActivity extends ActionBarActivity {
 
     }
 
-    private void scrollDown(final View v, final ListView listView){
+    private void scrollDown(final View v, final ListView listView, final MonthYearAdapter adapter, final int currentPosInMiddle){
 
         listView.post(new Runnable() {
             @Override
             public void run() {
                 listView.smoothScrollBy(v.getBottom() - (mRootLayoutHeight / 3 + v.getHeight()), 1000);
+                highLightMiddleRow(adapter,currentPosInMiddle);
 
             }
         });
@@ -244,15 +322,42 @@ public class DatePickerActivity extends ActionBarActivity {
     }
 
 
-    private void scrollUp(final View v, final ListView listView){
+    private void highLightMiddleRow(MonthYearAdapter adapter,int currentPosInMiddle){
+
+        adapter.setCurrentPos(currentPosInMiddle);
+        adapter.highlightCurrentMonthColor(true);
+        adapter.notifyDataSetChanged();
+    }
+
+
+    private void scrollUp(final View v, final ListView listView,final MonthYearAdapter adapter,final int currentPosInMiddle){
 
         listView.post(new Runnable() {
             @Override
             public void run() {
                 listView.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
+                highLightMiddleRow(adapter,currentPosInMiddle);
+
             }
         });
 
+    }
+
+    private int findOffsetForDate(int currentMonth){
+
+          switch (currentMonth){
+
+              case 31:
+                  return 0;
+              case 30:
+                  return  -1;
+              case 29:
+                  return -2;
+              case 28:
+                  return -3;
+
+          }
+           return 0;
     }
 
 

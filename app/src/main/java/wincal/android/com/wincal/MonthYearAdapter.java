@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,17 +15,16 @@ import java.util.GregorianCalendar;
 import java.util.IllegalFormatConversionException;
 import java.util.IllegalFormatException;
 import java.util.Locale;
-import java.text.DateFormat;
 
 /**
  * Created by Rahul Raja on 9/25/2014.
  */
 public class MonthYearAdapter extends BaseAdapter{
 
+    private static LayoutInflater inflater = null;
     Context context;
     String[] data;
-    private static LayoutInflater inflater = null;
-    private int currentMonthPos=0;
+    private int currentPos=0;
     private boolean alIItemsVisible=false;
     private boolean highlightCurrentMonth=true;
     private int dataLength=0;
@@ -54,25 +54,25 @@ public class MonthYearAdapter extends BaseAdapter{
         return this.highlightCurrentMonth;
     }
 
-    protected void setAllItemsVisible(boolean choice){
-
-        this.alIItemsVisible=choice;
-    }
-
     public boolean getAllItemsVisible(){
 
         return this.alIItemsVisible;
     }
 
-    protected void  setCurrentMonthPos(int pos){
+    protected void setAllItemsVisible(boolean choice){
 
-        currentMonthPos=pos;
+        this.alIItemsVisible=choice;
+    }
+
+    protected void  setCurrentPos(int pos){
+
+        currentPos=pos;
 
     }
 
     protected void highlightCurrentMonthColor(boolean choice){
 
-        highlightCurrentMonth=false;
+        highlightCurrentMonth=choice;
     }
 
     protected void setCurrentMonth(int currentMonth){
@@ -117,11 +117,12 @@ public class MonthYearAdapter extends BaseAdapter{
         }
 
 
-//        if(!this.alIItemsVisible)
-//            vi.setVisibility(View.INVISIBLE);
 
-       TextView subText = (TextView) vi.findViewById(R.id.row_text);
-       TextView mainText=(TextView)vi.findViewById(R.id.row_number);
+        if(!this.alIItemsVisible)
+            vi.setVisibility(View.INVISIBLE);
+
+        TextView subText = (TextView) vi.findViewById(R.id.row_text);
+        TextView mainText=(TextView)vi.findViewById(R.id.row_number);
 
         int actualPosition= position % dataLength;
 
@@ -149,11 +150,10 @@ public class MonthYearAdapter extends BaseAdapter{
         }
 
 
+        if(position==currentPos && highlightCurrentMonth ){
 
-        if(position==currentMonthPos && highlightCurrentMonth ){
-
-          vi.setVisibility(View.VISIBLE);
-           vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
+            vi.setVisibility(View.VISIBLE);
+            vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
         }
 
         if (isForDateView){
