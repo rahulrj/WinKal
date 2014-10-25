@@ -198,6 +198,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
                     if(state.getScrollState()==OnScrollListener.SCROLL_STATE_IDLE) {
                         listBeingTouched.compareAndSet(true, false);
+                        putThisViewInMiddle(event.getY(),listView);
                         adapter.highlightCurrentMonthColor(true);
                         adapter.notifyDataSetChanged();
                     }
@@ -243,6 +244,37 @@ public class DatePickerActivity extends ActionBarActivity {
         });
 
 
+    }
+
+    void putThisViewInMiddle(float y,final ListView listView){
+
+     double yValue=Math.ceil((double)y);
+        Log.d("yval",""+yValue);
+     for(int i=0;i<=listView.getLastVisiblePosition()-listView.getFirstVisiblePosition();i++){
+
+         View v=listView.getChildAt(i);
+         if(v!=null){
+
+            // Rect viewRect=new Rect();
+            // v.getGlobalVisibleRect(viewRect);
+             if(yValue>=v.getTop()-listView.getDividerHeight() && yValue<=v.getBottom()){
+
+                    scrollToMiddle(listView,i,v);
+             }
+         }
+     }
+
+    }
+
+    void scrollToMiddle(final ListView listView,final int i,final View v){
+
+        listView.post(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("rajul",""+v.getTop()+" "+v.getBottom()+" "+mRootLayoutHeight/3);
+                listView.smoothScrollBy(v.getTop()-mRootLayoutHeight/3,1000);
+            }
+        });
     }
 
      class ScrollState{
