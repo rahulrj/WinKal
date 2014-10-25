@@ -11,6 +11,8 @@ import android.view.View.OnTouchListener;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
@@ -51,7 +53,9 @@ public class DatePickerActivity extends ActionBarActivity {
     private AtomicBoolean mYearListBeingTouched = new AtomicBoolean(false);
     private AtomicBoolean mDateListBeingTouched = new AtomicBoolean(false);
     private int mRootLayoutHeight;
-    private int mScrollStateOfListView;
+    private int mScrollStateOfMonthView;
+    private int mScrollStateOfYearView;
+    private int mScrollStateOfDayView;
 
 
     @Override
@@ -66,6 +70,7 @@ public class DatePickerActivity extends ActionBarActivity {
         mDateListView = (ListView) findViewById(R.id.date_listview);
         mYearListView = (ListView) findViewById(R.id.year_listview);
 
+        mMonthListview.setClickable(true);
         String monthNames[]=getResources().getStringArray(R.array.month_names);
         mMonthAdapter = new MonthYearAdapter(this,monthNames,monthNames.length,Constants.NOT_FOR_DATE_VIEW);
         mMonthAdapter.setAllItemsVisible(true);
@@ -96,15 +101,13 @@ public class DatePickerActivity extends ActionBarActivity {
                 mYearListView.setSelectionFromTop(mCurrentYearPosition , mRootLayoutHeight / 3);
                 mDateListView.setSelectionFromTop(mCurrentDatePosition,mRootLayoutHeight/3);
 
-                setListenersOnListView(mMonthAdapter, mMonthListview, mMonthListBeingTouched);
-                setListenersOnListView(mYearAdapter, mYearListView,mYearListBeingTouched);
-                setListenersOnListView(mDateAdapter, mDateListView,mDateListBeingTouched);
+                setListenersOnListView(mMonthAdapter, mMonthListview, mMonthListBeingTouched,mScrollStateOfMonthView,new ScrollState());
+                setListenersOnListView(mYearAdapter, mYearListView,mYearListBeingTouched,mScrollStateOfYearView,new ScrollState());
+                setListenersOnListView(mDateAdapter, mDateListView,mDateListBeingTouched,mScrollStateOfDayView,new ScrollState());
 
 
             }
         });
-
-
 
 
     }
@@ -154,30 +157,37 @@ public class DatePickerActivity extends ActionBarActivity {
 
     }
 
-    private void setListenersOnListView(final MonthYearAdapter adapter, final ListView listView, final AtomicBoolean listBeingTouched) {
+
+    private void setListenersOnListView(final MonthYearAdapter adapter, final ListView listView, final AtomicBoolean listBeingTouched,final int mScrollStateOfListView,final ScrollState state) {
+
+
+        state.setScrollState(mScrollStateOfListView);
+
 
         listView.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    if(mScrollStateOfListView==OnScrollListener.SCROLL_STATE_IDLE) {
+                    if(state.getScrollState()==OnScrollListener.SCROLL_STATE_IDLE) {
 
                         setOtherListViewsInvisible(listView);
                         if (!adapter.getAllItemsVisible()) {
                             listBeingTouched.set(true);
                             adapter.setAllItemsVisible(true);
                             adapter.highlightCurrentMonthColor(false);
-                            //adapter.notifyDataSetChanged();
+                            adapter.notifyDataSetChanged();
 
                         } else if (adapter.getAllItemsVisible() && adapter.getHighlightCurrentMonth()) {
                             listBeingTouched.set(true);
                             adapter.highlightCurrentMonthColor(false);
                             adapter.notifyDataSetChanged();
+
+
                         }
 
                     }
-                    else if(mScrollStateOfListView==OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
+                    else if(state.getScrollState()==OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
                         listBeingTouched.set(true);
                     }
 
@@ -186,20 +196,23 @@ public class DatePickerActivity extends ActionBarActivity {
 
                 if (event.getAction() == MotionEvent.ACTION_UP) {
 
-                    if(mScrollStateOfListView==OnScrollListener.SCROLL_STATE_IDLE) {
+                    if(state.getScrollState()==OnScrollListener.SCROLL_STATE_IDLE) {
                         listBeingTouched.compareAndSet(true, false);
                         adapter.highlightCurrentMonthColor(true);
-                        //adapter.notifyDataSetChanged();
+                        adapter.notifyDataSetChanged();
                     }
 
-                    else if(mScrollStateOfListView==OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
+                    else if(state.getScrollState()==OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
 
                         listBeingTouched.compareAndSet(true,false);
+
                     }
 
-                    // return true;
+                     //return true;
 
                 }
+
+
                 return false;
             }
         });
@@ -212,7 +225,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
-                mScrollStateOfListView=scrollState;
+                state.setScrollState(scrollState);
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get()) {
                     listBeingTouched.set(true);
                     putSomeRowInMiddle(listView,adapter);
@@ -222,8 +235,32 @@ public class DatePickerActivity extends ActionBarActivity {
             }
         });
 
+        listView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                Log.d("rahulraja",""+position);
+            }
+        });
+
 
     }
+
+     class ScrollState{
+
+         private int mScrollStateOfListView;
+
+         public void setScrollState(int scrollState){
+
+             this.mScrollStateOfListView=scrollState;
+         }
+
+         public int getScrollState(){
+
+             return this.mScrollStateOfListView;
+         }
+
+
+     }
 
 
     private void setOtherListViewsInvisible(ListView listView){

@@ -116,7 +116,7 @@ public class MonthYearAdapter extends BaseAdapter{
             vi.setBackgroundResource(R.drawable.list_border);
         }
 
-
+        vi.setTag(""+position);
 
         if(!this.alIItemsVisible)
             vi.setVisibility(View.INVISIBLE);
