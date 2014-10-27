@@ -13,7 +13,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
@@ -57,6 +56,10 @@ public class DatePickerActivity extends ActionBarActivity {
     private int mScrollStateOfMonthView;
     private int mScrollStateOfYearView;
     private int mScrollStateOfDayView;
+
+    private boolean mCompleteDateListVisible=false;
+    private boolean mCompleteMonthListVisible=false;
+    private boolean mCompleteYearListVisible=false;
 
 
     @Override
@@ -102,9 +105,9 @@ public class DatePickerActivity extends ActionBarActivity {
                 mYearListView.setSelectionFromTop(mCurrentYearPosition , mRootLayoutHeight / 3);
                 mDateListView.setSelectionFromTop(mCurrentDatePosition,mRootLayoutHeight/3);
 
-                setListenersOnListView(mMonthAdapter, mMonthListview, mMonthListBeingTouched,mScrollStateOfMonthView,new ScrollState());
-                setListenersOnListView(mYearAdapter, mYearListView,mYearListBeingTouched,mScrollStateOfYearView,new ScrollState());
-                setListenersOnListView(mDateAdapter, mDateListView,mDateListBeingTouched,mScrollStateOfDayView,new ScrollState());
+                setListenersOnListView(mMonthAdapter, mMonthListview, mMonthListBeingTouched,mScrollStateOfMonthView,new ScrollState(),mCompleteMonthListVisible);
+                setListenersOnListView(mYearAdapter, mYearListView,mYearListBeingTouched,mScrollStateOfYearView,new ScrollState(),mCompleteYearListVisible);
+                setListenersOnListView(mDateAdapter, mDateListView,mDateListBeingTouched,mScrollStateOfDayView,new ScrollState(),mCompleteDateListVisible);
 
 
             }
@@ -159,7 +162,7 @@ public class DatePickerActivity extends ActionBarActivity {
     }
 
 
-    private void setListenersOnListView(final MonthYearAdapter adapter, final ListView listView, final AtomicBoolean listBeingTouched,final int mScrollStateOfListView,final ScrollState state) {
+    private void setListenersOnListView(final MonthYearAdapter adapter, final ListView listView, final AtomicBoolean listBeingTouched,final int mScrollStateOfListView,final ScrollState state, final boolean completeListVisible) {
 
 
         state.setScrollState(mScrollStateOfListView);
@@ -198,10 +201,20 @@ public class DatePickerActivity extends ActionBarActivity {
                 if (event.getAction() == MotionEvent.ACTION_UP) {
 
                     if(state.getScrollState()==OnScrollListener.SCROLL_STATE_IDLE) {
+
                         listBeingTouched.compareAndSet(true, false);
                         adapter.highlightCurrentMonthColor(true);
+
                        // adapter.notifyDataSetChanged();
-                        putThisViewInMiddle(event.getY(),listView,adapter);
+                        if(completeListVisible) {
+                            putThisViewInMiddle(event.getY(), listView, adapter);
+                        }
+                        else{
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        setCompleteListVisible(listView);
+
                     }
 
                     else if(state.getScrollState()==OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
@@ -230,7 +243,7 @@ public class DatePickerActivity extends ActionBarActivity {
                 state.setScrollState(scrollState);
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get()) {
                     listBeingTouched.set(true);
-                    putSomeRowInMiddle(listView,adapter);
+                    putSomeRowInMiddle(listView, adapter);
 
                 }
 
@@ -247,6 +260,20 @@ public class DatePickerActivity extends ActionBarActivity {
             }
         });
 
+
+    }
+
+    void setCompleteListVisible(ListView listView){
+
+        if(listView.getId()==R.id.year_listview){
+            mCompleteYearListVisible=true;
+        }
+        else if(listView.getId()==R.id.month_listview){
+            mCompleteMonthListVisible=true;
+        }
+        else if(listView.getId()==R.id.date_listview){
+            mCompleteDateListVisible=true;
+        }
 
     }
 
@@ -275,7 +302,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
         adapter.setCurrentPos(listView.getFirstVisiblePosition()+i);
         adapter.notifyDataSetChanged();
-        listView.smoothScrollBy(v.getTop()-mRootLayoutHeight/3,1000);
+        listView.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
         Log.d("yhape",""+v.getTop()+" "+v.getBottom()+" "+mRootLayoutHeight/3);
 //        listView.post(new Runnable() {
 //            @Override
