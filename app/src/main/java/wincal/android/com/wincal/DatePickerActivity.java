@@ -13,6 +13,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
@@ -198,9 +199,9 @@ public class DatePickerActivity extends ActionBarActivity {
 
                     if(state.getScrollState()==OnScrollListener.SCROLL_STATE_IDLE) {
                         listBeingTouched.compareAndSet(true, false);
-                        putThisViewInMiddle(event.getY(),listView);
                         adapter.highlightCurrentMonthColor(true);
-                        adapter.notifyDataSetChanged();
+                       // adapter.notifyDataSetChanged();
+                        putThisViewInMiddle(event.getY(),listView,adapter);
                     }
 
                     else if(state.getScrollState()==OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
@@ -239,42 +240,51 @@ public class DatePickerActivity extends ActionBarActivity {
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                Log.d("rahulraja",""+position);
+//                listBeingTouched.compareAndSet(true, false);
+//               // putThisViewInMiddle(event.getY(),listView);
+//                adapter.highlightCurrentMonthColor(true);
+//                adapter.notifyDataSetChanged();
             }
         });
 
 
     }
 
-    void putThisViewInMiddle(float y,final ListView listView){
+    void putThisViewInMiddle(float y,final ListView listView,MonthYearAdapter adapter){
 
      double yValue=Math.ceil((double)y);
         Log.d("yval",""+yValue);
      for(int i=0;i<=listView.getLastVisiblePosition()-listView.getFirstVisiblePosition();i++){
 
          View v=listView.getChildAt(i);
-         if(v!=null){
+         if(v!=null && v.getTop()!=mRootLayoutHeight/3){
 
             // Rect viewRect=new Rect();
             // v.getGlobalVisibleRect(viewRect);
              if(yValue>=v.getTop()-listView.getDividerHeight() && yValue<=v.getBottom()){
 
-                    scrollToMiddle(listView,i,v);
+                    Log.d("rajul",""+v.getTop()+" "+v.getBottom()+" "+mRootLayoutHeight/3);
+                    scrollToMiddle(listView,i,v,adapter);
              }
          }
      }
 
     }
 
-    void scrollToMiddle(final ListView listView,final int i,final View v){
+    void scrollToMiddle(final ListView listView,final int i,final View v,MonthYearAdapter adapter){
 
-        listView.post(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("rajul",""+v.getTop()+" "+v.getBottom()+" "+mRootLayoutHeight/3);
-                listView.smoothScrollBy(v.getTop()-mRootLayoutHeight/3,1000);
-            }
-        });
+        adapter.setCurrentPos(listView.getFirstVisiblePosition()+i);
+        adapter.notifyDataSetChanged();
+        listView.smoothScrollBy(v.getTop()-mRootLayoutHeight/3,1000);
+        Log.d("yhape",""+v.getTop()+" "+v.getBottom()+" "+mRootLayoutHeight/3);
+//        listView.post(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                Log.d("yhape",""+v.getTop()+" "+v.getBottom()+" "+mRootLayoutHeight/3);
+//
+//            }
+//        });
     }
 
      class ScrollState{
