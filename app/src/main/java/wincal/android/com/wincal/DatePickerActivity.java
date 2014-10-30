@@ -78,8 +78,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
         initializeObjects();
 
-
-        mMonthListview.setClickable(true);
+        //mMonthListview.setClickable(true);
         String monthNames[] = getResources().getStringArray(R.array.month_names);
         mMonthAdapter = new MonthYearAdapter(this, monthNames, monthNames.length, Constants.NOT_FOR_DATE_VIEW);
         mMonthAdapter.setAllItemsVisible(true);
@@ -192,7 +191,8 @@ public class DatePickerActivity extends ActionBarActivity {
                     if (state.getScrollState() == OnScrollListener.SCROLL_STATE_IDLE) {
 
                         setOtherListViewsInvisible(listView);
-                        stopOtherScrolls(mMonthListview);
+                        if(listView.getId()==R.id.year_listview)
+                                stopOtherScrolls(mMonthListview);
                         if (!adapter.getAllItemsVisible()) {
                             listBeingTouched.set(true);
                             adapter.setAllItemsVisible(true);
@@ -255,6 +255,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
                 state.setScrollState(scrollState);
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get()) {
+
                     listBeingTouched.set(true);
                     putSomeRowInMiddle(listView, adapter);
 
@@ -319,7 +320,7 @@ public class DatePickerActivity extends ActionBarActivity {
         for (int i = 0; i <= listView.getLastVisiblePosition() - listView.getFirstVisiblePosition(); i++) {
 
             View v = listView.getChildAt(i);
-            if (v != null && v.getTop() != mRootLayoutHeight / 3) {
+            if (v != null ) {
 
                 // Rect viewRect=new Rect();
                 // v.getGlobalVisibleRect(viewRect);
@@ -327,6 +328,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
                     Log.d("rajul", "" + v.getTop() + " " + v.getBottom() + " " + mRootLayoutHeight / 3);
                     scrollToMiddle(listView, i, v, adapter);
+                    break;
                 }
             }
         }
@@ -440,10 +442,12 @@ public class DatePickerActivity extends ActionBarActivity {
 
                 if ((v.getTop() >= mRootLayoutHeight / 3) && v.getTop() < mMiddlePositionInScreen) {
                     scrollUp(v, listView, adapter, listView.getFirstVisiblePosition() + i);
+                    break;
                 }
 
                 if ((v.getBottom() >= mMiddlePositionInScreen) && v.getBottom() < mBottomPositionOfMiddleElement) {
                     scrollDown(v, listView, adapter, listView.getFirstVisiblePosition() + i);
+                    break;
                 }
 
 
@@ -451,6 +455,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
                     if (v.getBottom() + listView.getDividerHeight() / 2 >= mMiddlePositionInScreen) {
                         scrollDown(v, listView, adapter, listView.getFirstVisiblePosition() + i);
+                        break;
                     }
 
                 }
@@ -459,6 +464,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
                     if (v.getTop() - listView.getDividerHeight() / 2 <= mMiddlePositionInScreen) {
                         scrollUp(v, listView, adapter, listView.getFirstVisiblePosition() + i);
+                        break;
                     }
 
                 }
@@ -475,7 +481,23 @@ public class DatePickerActivity extends ActionBarActivity {
         listView.post(new Runnable() {
             @Override
             public void run() {
-                listView.smoothScrollBy(v.getBottom() - (mRootLayoutHeight / 3 + v.getHeight()), 1000);
+                //listView.smoothScrollBy(v.getBottom() - (mRootLayoutHeight / 3 + v.getHeight()), 1000);
+                Log.d("rahulraja","gonedown"+v.getTop());
+                highLightMiddleRow(adapter, currentPosInMiddle);
+
+            }
+        });
+
+    }
+
+
+    private void scrollUp(final View v, final ListView listView, final MonthYearAdapter adapter, final int currentPosInMiddle) {
+
+        listView.post(new Runnable() {
+            @Override
+            public void run() {
+               // listView.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
+                Log.d("rahulraja","goneup"+v.getTop());
                 highLightMiddleRow(adapter, currentPosInMiddle);
 
             }
@@ -492,18 +514,6 @@ public class DatePickerActivity extends ActionBarActivity {
     }
 
 
-    private void scrollUp(final View v, final ListView listView, final MonthYearAdapter adapter, final int currentPosInMiddle) {
-
-        listView.post(new Runnable() {
-            @Override
-            public void run() {
-                listView.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
-                highLightMiddleRow(adapter, currentPosInMiddle);
-
-            }
-        });
-
-    }
 
     private int findOffsetForDate(int currentMonth) {
 
