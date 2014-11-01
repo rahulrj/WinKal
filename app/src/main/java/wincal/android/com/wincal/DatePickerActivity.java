@@ -446,6 +446,8 @@ public class DatePickerActivity extends ActionBarActivity {
                 }
 
                 if ((v.getBottom() >= mMiddlePositionInScreen) && v.getBottom() < mBottomPositionOfMiddleElement) {
+
+                    Log.d("rahulrajayes",""+v.getBottom()+" "+mMiddlePositionInScreen+" "+mBottomPositionOfMiddleElement);
                     scrollDown(v, listView, adapter, listView.getFirstVisiblePosition() + i);
                     break;
                 }
@@ -454,6 +456,7 @@ public class DatePickerActivity extends ActionBarActivity {
                 if (v.getBottom() <= mMiddlePositionInScreen && v.getBottom() > mRootLayoutHeight / 3) {
 
                     if (v.getBottom() + listView.getDividerHeight() / 2 >= mMiddlePositionInScreen) {
+                        Log.d("rahulraja",""+v.getBottom()+" "+mMiddlePositionInScreen+" "+mRootLayoutHeight/3);
                         scrollDown(v, listView, adapter, listView.getFirstVisiblePosition() + i);
                         break;
                     }
@@ -481,8 +484,8 @@ public class DatePickerActivity extends ActionBarActivity {
         listView.post(new Runnable() {
             @Override
             public void run() {
-                //listView.smoothScrollBy(v.getBottom() - (mRootLayoutHeight / 3 + v.getHeight()), 1000);
-                Log.d("rahulraja","gonedown"+v.getTop());
+                Log.d("rahulrajadown","gonedown"+v.getBottom());
+                listView.smoothScrollBy(v.getBottom() - (mRootLayoutHeight / 3 + v.getHeight()), 1000);
                 highLightMiddleRow(adapter, currentPosInMiddle);
 
             }
@@ -496,8 +499,8 @@ public class DatePickerActivity extends ActionBarActivity {
         listView.post(new Runnable() {
             @Override
             public void run() {
-               // listView.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
                 Log.d("rahulraja","goneup"+v.getTop());
+                listView.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
                 highLightMiddleRow(adapter, currentPosInMiddle);
 
             }
