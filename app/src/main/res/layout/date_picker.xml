@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/root_layout"
     android:background="@color/cal_background"
+    android:windowEnableSplitTouch="false"
     tools:context=".MyActivity">
 
     <LinearLayout
