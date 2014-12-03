@@ -6,6 +6,7 @@
     android:layout_height="@dimen/row_height"
     android:paddingBottom="@dimen/row_content_bottom_padding"
     android:background="@drawable/list_border"
+    android:splitMotionEvents="false"
     >
 
 
@@ -15,6 +16,7 @@
         android:orientation="vertical"
         android:layout_marginLeft="@dimen/row_content_margin_left"
         android:layout_marginTop="@dimen/row_content_margin_top"
+        android:splitMotionEvents="false"
         >
 
         <TextView

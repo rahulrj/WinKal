@@ -4,13 +4,14 @@
     android:layout_height="match_parent"
     android:id="@+id/root_layout"
     android:background="@color/cal_background"
-    android:windowEnableSplitTouch="false"
+    android:splitMotionEvents="false"
     tools:context=".MyActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:weightSum="3"
+        android:splitMotionEvents="false"
         android:orientation="horizontal">
 
 

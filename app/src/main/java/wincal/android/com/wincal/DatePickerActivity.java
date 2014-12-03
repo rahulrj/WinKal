@@ -63,6 +63,8 @@ public class DatePickerActivity extends ActionBarActivity {
     private ListViewVisible mYearViewVisible;
     private ListViewVisible mDateViewVisible;
 
+    private int mMiddlePositionFromTop;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +97,9 @@ public class DatePickerActivity extends ActionBarActivity {
         mDateListView.setAdapter(mDateAdapter);
 
         setCurrentPositionsInListViews();
-
         final RelativeLayout rootLayout = (RelativeLayout) findViewById(R.id.root_layout);
+
+
         ViewTreeObserver vto = rootLayout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -113,9 +116,16 @@ public class DatePickerActivity extends ActionBarActivity {
                 setListenersOnListView(mYearAdapter, mYearListView, mYearListBeingTouched, mScrollStateOfYearView, mYearViewVisible);
                 setListenersOnListView(mDateAdapter, mDateListView, mDateListBeingTouched, mScrollStateOfDayView, mDateViewVisible);
 
+                mMiddlePositionFromTop=mCurrentMonthPosition-mMonthListview.getFirstVisiblePosition();
+                //Log.d("rahul",""+mCurrentMonthPosition+" "+mDateListView.getLastVisiblePosition());
+
+
+
 
             }
         });
+
+
 
 
     }
@@ -188,9 +198,12 @@ public class DatePickerActivity extends ActionBarActivity {
         listView.setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    //disableOtherListViews(listView);
+                    disableOtherListViews(listView);
+                    Log.d("rahul","pop");
                     if (state.getScrollState() == OnScrollListener.SCROLL_STATE_IDLE) {
+
                         stopOtherScrolls(listView);
                         setOtherListViewsInvisible(listView);
                         if (!adapter.getAllItemsVisible()) {
@@ -217,6 +230,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
                 if (event.getAction() == MotionEvent.ACTION_UP) {
 
+
                     enableAllListViews();
                     if (state.getScrollState() == OnScrollListener.SCROLL_STATE_IDLE) {
 
@@ -242,7 +256,6 @@ public class DatePickerActivity extends ActionBarActivity {
 
                 }
 
-
                 return false;
             }
         });
@@ -251,6 +264,8 @@ public class DatePickerActivity extends ActionBarActivity {
         listView.setOnScrollListener(new OnScrollListener() {
 
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+
             }
 
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -262,20 +277,13 @@ public class DatePickerActivity extends ActionBarActivity {
                     putSomeRowInMiddle(listView, adapter);
 
                 }
-
-
-
-
             }
         });
 
         listView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-//                listBeingTouched.compareAndSet(true, false);
-//               // putThisViewInMiddle(event.getY(),listView);
-//                adapter.highlightCurrentMonthColor(true);
-//                adapter.notifyDataSetChanged();
+
             }
         });
 
@@ -311,8 +319,6 @@ public class DatePickerActivity extends ActionBarActivity {
             mMonthListview.setEnabled(false);
             mYearListView.setEnabled(false);
         }
-
-
 
     }
 
@@ -557,16 +563,15 @@ public class DatePickerActivity extends ActionBarActivity {
 
     }
 
-
-    private void highLightMiddleRow(MonthYearAdapter adapter, int currentPosInMiddle) {
+ private void highLightMiddleRow(MonthYearAdapter adapter, int currentPosInMiddle) {
 
         adapter.setCurrentPos(currentPosInMiddle);
         adapter.highlightCurrentMonthColor(true);
         adapter.notifyDataSetChanged();
-    }
+ }
 
 
-    private int findOffsetForDate(int currentMonth) {
+ private int findOffsetForDate(int currentMonth) {
 
         switch (currentMonth) {
 
