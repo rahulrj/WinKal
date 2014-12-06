@@ -49,6 +49,13 @@ public class MonthYearAdapter extends BaseAdapter{
 
     }
 
+    protected void  setNewDateParameters(String[] data){
+
+         this.data=data;
+         this.dataLength=data.length;
+
+    }
+
     public boolean getHighlightCurrentMonth(){
 
         return this.highlightCurrentMonth;
@@ -68,6 +75,11 @@ public class MonthYearAdapter extends BaseAdapter{
 
         currentPos=pos;
 
+    }
+
+    protected int getCurrentPos(){
+
+        return this.currentPos;
     }
 
     protected void highlightCurrentMonthColor(boolean choice){
