@@ -64,8 +64,8 @@ public class DatePickerActivity extends ActionBarActivity {
 
     private int mMiddlePositionFromTop;
 
-    private int mInitialMonth=0;
-    private int mFinalMonth=0;
+    private int mInitialMonth = 0;
+    private int mFinalMonth = 0;
 
 
     @Override
@@ -74,7 +74,7 @@ public class DatePickerActivity extends ActionBarActivity {
 
         setContentView(R.layout.date_picker);
         getCurrentDate();
-        findCalendarForCurrentMonth(mCurrentYear,mCurrentMonth+1);
+        findCalendarForCurrentMonth(mCurrentYear, mCurrentMonth + 1);
 
         mMonthListview = (ListView) findViewById(R.id.month_listview);
         mDateListView = (ListView) findViewById(R.id.date_listview);
@@ -125,43 +125,32 @@ public class DatePickerActivity extends ActionBarActivity {
         });
 
 
-
-
     }
 
 
     /**
      * returns the midlle position which has the highlight
      */
-    protected void getMiddlePosition(){
+    protected void getMiddlePosition() {
 
         mMonthListview.post(new Runnable() {
             public void run() {
 
-
-               mMiddlePositionFromTop=mMonthAdapter.getCurrentPos()-mMonthListview.getFirstVisiblePosition();
-                getInitialAndFinalMonth(mMiddlePositionFromTop,mInitialMonth,mFinalMonth);
+                mMiddlePositionFromTop = mMonthAdapter.getCurrentPos() - mMonthListview.getFirstVisiblePosition();
+                getInitialAndFinalMonth(mMiddlePositionFromTop);
 
             }
         });
 
     }
 
-    protected void getInitialAndFinalMonth(int position,int initialMonth,int finalMonth){
+    protected void getInitialAndFinalMonth(int position) {
 
-
-        if(mFinalMonth!=0){
-            mInitialMonth=mFinalMonth;
-        }
-        View middleView=mMonthListview.getChildAt(position);
-        TextView monthView=(TextView)middleView.findViewById(R.id.row_number);
-        initialMonth=Integer.parseInt(monthView.getText().toString());
-
-
-
+        View middleView = mMonthListview.getChildAt(position);
+        TextView monthView = (TextView) middleView.findViewById(R.id.row_number);
+        mInitialMonth = Integer.parseInt(monthView.getText().toString());
 
     }
-
 
 
     private void initializeObjects() {
@@ -191,20 +180,20 @@ public class DatePickerActivity extends ActionBarActivity {
 
     }
 
-    private void findCalendarForCurrentMonth(int currentYear,int currentMonth) {
+    private void findCalendarForCurrentMonth(int currentYear, int currentMonth) {
 
         Calendar cal = new GregorianCalendar();
         cal.clear();
-        cal.set(currentYear, currentMonth-1, 1);
+        cal.set(currentYear, currentMonth - 1, 1);
 
         // mFirstWeekDayOfMonth=cal.get(Calendar.DAY_OF_WEEK);
         mNumberOfMonthDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-        Log.d("abc",""+mNumberOfMonthDays+ " "+currentMonth);
+        Log.d("abc", "" + mNumberOfMonthDays + " " + currentMonth);
 
-        daysOfTheMonth = new String[mNumberOfMonthDays ];
+        daysOfTheMonth = new String[mNumberOfMonthDays];
         for (int i = 0; i < mNumberOfMonthDays; i++) {
 
-            daysOfTheMonth[i] = String.valueOf(i+1);
+            daysOfTheMonth[i] = String.valueOf(i + 1);
         }
 
     }
@@ -220,8 +209,6 @@ public class DatePickerActivity extends ActionBarActivity {
         mMonthAdapter.setCurrentPos(mCurrentMonthPosition);
         mYearAdapter.setCurrentPos(mCurrentYearPosition);
         mDateAdapter.setCurrentPos(mCurrentDatePosition);
-
-
 
 
     }
@@ -251,20 +238,19 @@ public class DatePickerActivity extends ActionBarActivity {
                         adapter.highlightCurrentMonthColor(false);
                         adapter.notifyDataSetChanged();
 
-
                     }
 
 
                     if (state.getScrollState() == OnScrollListener.SCROLL_STATE_IDLE) {
 
-                        if(listView.getId()==R.id.date_listview){
+                        if (listView.getId() == R.id.date_listview) {
 
                             addDatesInDateView();
                         }
 
-                   } else if (state.getScrollState() == OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    } else if (state.getScrollState() == OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
                         listBeingTouched.set(true);
-                   }
+                    }
 
 
                     //return true;
@@ -282,14 +268,13 @@ public class DatePickerActivity extends ActionBarActivity {
 
                         adapter.highlightCurrentMonthColor(true);
                         if (completeListVisible.isCompleteListViewVisible()) {
-                           // putThisViewInMiddle(event.getY(), listView, adapter);
+                            // putThisViewInMiddle(event.getY(), listView, adapter);
                         } else {
                             adapter.notifyDataSetChanged();
                         }
 
                         completeListVisible.setCompleteListViewVisible(true);
                     }
-
 
 
                 }
@@ -309,7 +294,7 @@ public class DatePickerActivity extends ActionBarActivity {
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
                 state.setScrollState(scrollState);
-                Log.d("rahul",""+scrollState);
+                //Log.d("rahul",""+scrollState);
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get()) {
 
 
@@ -321,80 +306,86 @@ public class DatePickerActivity extends ActionBarActivity {
         });
 
 
+    }
 
+
+    protected void addDatesInDateView() {
+
+        View monthChildView = getMiddleView(mMonthListview, mMiddlePositionFromTop);
+        View yearChildView = getMiddleView(mYearListView, mMiddlePositionFromTop);
+
+        TextView month = (TextView) monthChildView.findViewById(R.id.row_number);
+        TextView year = (TextView) yearChildView.findViewById(R.id.row_number);
+
+        int yearText = Integer.parseInt(year.getText().toString());
+        int monthText = Integer.parseInt(month.getText().toString());
+
+        mFinalMonth = monthText;
+        findCalendarForCurrentMonth(yearText, monthText);
+        setNewDatesInDateAdapter(yearText, monthText);
 
     }
 
-//    void setCompleteListVisible(ListView listView){
-//
-//        if(listView.getId()==R.id.year_listview){
-//            mCompleteYearListVisible=true;
-//        }
-//        else if(listView.getId()==R.id.month_listview){
-//            mCompleteMonthListVisible=true;
-//        }
-//        else if(listView.getId()==R.id.date_listview){
-//            mCompleteDateListVisible=true;
-//        }
-//
-//    }
-
-
-    protected void addDatesInDateView(){
-
-        View monthChildView=getMiddleView(mMonthListview,mMiddlePositionFromTop);
-        View yearChildView=getMiddleView(mYearListView,mMiddlePositionFromTop);
-
-        TextView month=(TextView)monthChildView.findViewById(R.id.row_number);
-        TextView year=(TextView)yearChildView.findViewById(R.id.row_number);
-
-        findCalendarForCurrentMonth(Integer.parseInt(year.getText().toString()),Integer.parseInt(month.getText().toString()));
-        setNewDatesInDateAdapter();
-
-    }
-
-    protected void setNewDatesInDateAdapter(){
+    protected void setNewDatesInDateAdapter(int year, int month) {
 
         mDateAdapter.setNewDateParameters(daysOfTheMonth);
+        int daysInInitialMonth = getNumberOfDaysInMonth(mInitialMonth, year);
+        int daysInFinalMonth = getNumberOfDaysInMonth(mFinalMonth, year);
+        int offsetForAdapter = findOffestForAdapter(daysInInitialMonth, daysInFinalMonth);
+
+        Log.d("rahu;l", "" + daysInInitialMonth + " " + daysInFinalMonth);
+        mDateAdapter.setCurrentPos(mDateAdapter.getCurrentPos() - offsetForAdapter);              // to keep the same date when month changes
+        mDateAdapter.setCurrentMonth(month - 1);
+        mDateAdapter.setCurrentYear(year);
         mDateAdapter.notifyDataSetChanged();
+        mDateListView.setSelectionFromTop(mDateAdapter.getCurrentPos(), mRootLayoutHeight / 3);  //to keep the same date when month changes
+        mInitialMonth = mFinalMonth;
 
 
     }
 
-    protected View getMiddleView(ListView listView,int position){
+    protected int getNumberOfDaysInMonth(int month, int year) {
+
+        Calendar cal = new GregorianCalendar();
+        cal.set(year, month - 1, 1);
+        int numberOfDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        return numberOfDays;
+
+
+    }
+
+    protected View getMiddleView(ListView listView, int position) {
 
         return listView.getChildAt(mMiddlePositionFromTop);
 
     }
 
-    private void disableOtherListViews(ListView listView){
+    private void disableOtherListViews(ListView listView) {
 
-        if(listView.getId()==R.id.month_listview){
+        if (listView.getId() == R.id.month_listview) {
             mDateListView.setEnabled(false);
             mYearListView.setEnabled(false);
 
-        }
-       else  if(listView.getId()==R.id.year_listview){
+        } else if (listView.getId() == R.id.year_listview) {
             mDateListView.setEnabled(false);
             mMonthListview.setEnabled(false);
-        }
-       else if(listView.getId()==R.id.date_listview){
+        } else if (listView.getId() == R.id.date_listview) {
             mMonthListview.setEnabled(false);
             mYearListView.setEnabled(false);
         }
 
     }
 
-    private void enableAllListViews(){
+    private void enableAllListViews() {
 
         mMonthListview.setEnabled(true);
         mDateListView.setEnabled(true);
         mYearListView.setEnabled(true);
     }
 
-    private ListView getScrollingListView(ScrollState state1,ScrollState state2,ListView view1,ListView view2){
+    private ListView getScrollingListView(ScrollState state1, ScrollState state2, ListView view1, ListView view2) {
 
-       ListView listView  = (state1.getScrollState() == OnScrollListener.SCROLL_STATE_FLING) ? view1 : (state2.getScrollState() == OnScrollListener.SCROLL_STATE_FLING) ? view2 : null;
+        ListView listView = (state1.getScrollState() == OnScrollListener.SCROLL_STATE_FLING) ? view1 : (state2.getScrollState() == OnScrollListener.SCROLL_STATE_FLING) ? view2 : null;
 
         return listView;
 
@@ -404,16 +395,14 @@ public class DatePickerActivity extends ActionBarActivity {
 
 
         if (listView.getId() == R.id.month_listview) {
-            listView=getScrollingListView(mScrollStateOfDayView,mScrollStateOfYearView,mDateListView,mYearListView);
-        }
-        else if(listView.getId()==R.id.date_listview){
-            listView=getScrollingListView(mScrollStateOfMonthView,mScrollStateOfYearView,mMonthListview,mYearListView);
-        }
-        else if(listView.getId()==R.id.year_listview){
-            listView=getScrollingListView(mScrollStateOfMonthView,mScrollStateOfDayView,mMonthListview,mDateListView);
+            listView = getScrollingListView(mScrollStateOfDayView, mScrollStateOfYearView, mDateListView, mYearListView);
+        } else if (listView.getId() == R.id.date_listview) {
+            listView = getScrollingListView(mScrollStateOfMonthView, mScrollStateOfYearView, mMonthListview, mYearListView);
+        } else if (listView.getId() == R.id.year_listview) {
+            listView = getScrollingListView(mScrollStateOfMonthView, mScrollStateOfDayView, mMonthListview, mDateListView);
         }
 
-        if (listView!=null) {
+        if (listView != null) {
 
             try {
                 Field field = android.widget.AbsListView.class.getDeclaredField("mFlingRunnable");
@@ -459,9 +448,8 @@ public class DatePickerActivity extends ActionBarActivity {
         adapter.notifyDataSetChanged();
         listView.smoothScrollBy(v.getTop() - mRootLayoutHeight / 3, 1000);
 
-        getInitialAndFinalMonth(listView.getFirstVisiblePosition()+i,mFinalMonth,mInitialMonth);
 
-       // Log.d("yhape", "" + v.getTop() + " " + v.getBottom() + " " + mRootLayoutHeight / 3);
+        // Log.d("yhape", "" + v.getTop() + " " + v.getBottom() + " " + mRootLayoutHeight / 3);
 //        listView.post(new Runnable() {
 //            @Override
 //            public void run() {
@@ -561,13 +549,13 @@ public class DatePickerActivity extends ActionBarActivity {
                     mBottomPositionOfMiddleElement = mRootLayoutHeight / 3 + v.getHeight();
                 }
 
-               /// Log.d("A",""+v.getTop()+ " "+mRootLayoutHeight/3+ " "+mMiddlePositionInScreen);
+                /// Log.d("A",""+v.getTop()+ " "+mRootLayoutHeight/3+ " "+mMiddlePositionInScreen);
                 if ((v.getTop() >= mRootLayoutHeight / 3) && v.getTop() < mMiddlePositionInScreen) {
                     scrollUp(v.getTop(), listView, adapter, listView.getFirstVisiblePosition() + i);
                     break;
                 }
 
-               // Log.d("B",""+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mBottomPositionOfMiddleElement);
+                // Log.d("B",""+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mBottomPositionOfMiddleElement);
                 if ((v.getBottom() >= mMiddlePositionInScreen) && v.getBottom() < mBottomPositionOfMiddleElement) {
 
                     // Log.d("rahulrajayes",""+v.getBottom()+" "+mMiddlePositionInScreen+" "+mBottomPositionOfMiddleElement);
@@ -576,7 +564,7 @@ public class DatePickerActivity extends ActionBarActivity {
                 }
 
 
-               // Log.d("C",""+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mRootLayoutHeight/3+ " "+(v.getBottom()+listView.getDividerHeight()/2));
+                // Log.d("C",""+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mRootLayoutHeight/3+ " "+(v.getBottom()+listView.getDividerHeight()/2));
                 if (v.getBottom() <= mMiddlePositionInScreen && v.getBottom() > mRootLayoutHeight / 3) {
 
                     if (v.getBottom() + listView.getDividerHeight() / 2 >= mMiddlePositionInScreen) {
@@ -634,20 +622,56 @@ public class DatePickerActivity extends ActionBarActivity {
 
     }
 
- private void highLightMiddleRow(MonthYearAdapter adapter, int currentPosInMiddle) {
+    private void highLightMiddleRow(MonthYearAdapter adapter, int currentPosInMiddle) {
 
         adapter.setCurrentPos(currentPosInMiddle);
         adapter.highlightCurrentMonthColor(true);
         adapter.notifyDataSetChanged();
 
 
-      getInitialAndFinalMonth(currentPosInMiddle,mFinalMonth,mInitialMonth);
+    }
 
+    private int findOffestForAdapter(int initialMonth, int finalMonth) {
 
- }
+        switch (initialMonth) {
 
+            case 31:
+                if (finalMonth == 30 || finalMonth == 29) {
+                    return 3;
 
- private int findOffsetForDate(int currentMonth) {
+                } else if (finalMonth == 28) {
+                    return 7;
+
+                }
+                break;
+
+            case 30:
+                if (finalMonth == 31) {
+                    return -3;
+                } else if (finalMonth == 28)
+                    return 4;
+                break;
+
+            case 28:
+                if (finalMonth == 31) {
+                    return -7;
+                } else if (finalMonth == 30)
+                    return -4;
+                break;
+
+            case 29:
+                if(finalMonth==31){
+
+                    return -3;
+                }
+                else if(finalMonth==30){
+
+                }
+        }
+        return 0;
+    }
+
+    private int findOffsetForDate(int currentMonth) {
 
         switch (currentMonth) {
 
