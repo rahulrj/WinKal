@@ -84,7 +84,7 @@ public class MonthYearAdapter extends BaseAdapter{
 
     protected void highlightCurrentMonthColor(boolean choice){
 
-        highlightCurrentMonth=choice;
+        this.highlightCurrentMonth=choice;
     }
 
     protected void setCurrentMonth(int currentMonth){
@@ -128,7 +128,7 @@ public class MonthYearAdapter extends BaseAdapter{
             vi.setBackgroundResource(R.drawable.list_border);
         }
 
-        vi.setTag(""+position);
+     //   vi.setTag(""+position);
 
         if(!this.alIItemsVisible)
             vi.setVisibility(View.INVISIBLE);
@@ -152,8 +152,6 @@ public class MonthYearAdapter extends BaseAdapter{
 
                 mainText.setText(String.valueOf(actualPosition+1));
             }
-
-
         }
 
         else{
@@ -162,10 +160,13 @@ public class MonthYearAdapter extends BaseAdapter{
         }
 
 
-        if(position==currentPos && highlightCurrentMonth ){
+        if(position==currentPos ){
+
 
             vi.setVisibility(View.VISIBLE);
-            vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
+            //if(highlightCurrentMonth)
+                     vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
+           // highlightCurrentMonth=false;
         }
 
         if (isForDateView){
