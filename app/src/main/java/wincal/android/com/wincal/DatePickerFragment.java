@@ -1,13 +1,14 @@
 package wincal.android.com.wincal;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -23,7 +24,7 @@ import java.util.GregorianCalendar;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class DatePickerActivity extends ActionBarActivity {
+public class DatePickerFragment extends DialogFragment {
 
 
     private ListView mMonthListview;
@@ -74,27 +75,30 @@ public class DatePickerActivity extends ActionBarActivity {
     private int ACTION_MOVED=0;
 
 
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View  onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.date_picker);
+        View view = inflater.inflate(R.layout.date_picker, container, false);
         getCurrentDate();
         findCalendarForCurrentMonth(mCurrentYear, mCurrentMonth + 1);
 
-        mMonthListview = (ListView) findViewById(R.id.month_listview);
-        mDateListView = (ListView) findViewById(R.id.date_listview);
-        mYearListView = (ListView) findViewById(R.id.year_listview);
+        mMonthListview = (ListView) view.findViewById(R.id.month_listview);
+        mDateListView = (ListView) view.findViewById(R.id.date_listview);
+        mYearListView = (ListView) view.findViewById(R.id.year_listview);
 
         initializeObjects();
 
         //mMonthListview.setClickable(true);
         String monthNames[] = getResources().getStringArray(R.array.month_names);
-        mMonthAdapter = new MonthYearAdapter(this, monthNames, monthNames.length, Constants.NOT_FOR_DATE_VIEW);
+        mMonthAdapter = new MonthYearAdapter(getActivity(), monthNames, monthNames.length, Constants.NOT_FOR_DATE_VIEW);
         mMonthAdapter.setAllItemsVisible(true);
 
-        mYearAdapter = new MonthYearAdapter(this, null, Constants.NO_OF_YEARS, Constants.NOT_FOR_DATE_VIEW);
-        mDateAdapter = new MonthYearAdapter(this, daysOfTheMonth, daysOfTheMonth.length, Constants.FOR_DATE_VIEW);
+        mYearAdapter = new MonthYearAdapter(getActivity(), null, Constants.NO_OF_YEARS, Constants.NOT_FOR_DATE_VIEW);
+        mDateAdapter = new MonthYearAdapter(getActivity(), daysOfTheMonth, daysOfTheMonth.length, Constants.FOR_DATE_VIEW);
         mDateAdapter.setCurrentMonth(mCurrentMonth);
         mDateAdapter.setCurrentYear(mCurrentYear);
         mYearAdapter.setAllItemsVisible(false);
@@ -105,7 +109,7 @@ public class DatePickerActivity extends ActionBarActivity {
         mDateListView.setAdapter(mDateAdapter);
 
         setCurrentPositionsInListViews();
-        final RelativeLayout rootLayout = (RelativeLayout) findViewById(R.id.root_layout);
+        final RelativeLayout rootLayout = (RelativeLayout)view. findViewById(R.id.root_layout);
 
 
         ViewTreeObserver vto = rootLayout.getViewTreeObserver();
@@ -130,6 +134,7 @@ public class DatePickerActivity extends ActionBarActivity {
             }
         });
 
+        return view;
 
     }
 
@@ -718,12 +723,7 @@ public class DatePickerActivity extends ActionBarActivity {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.my, menu);
-        return true;
-    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
