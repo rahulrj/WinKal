@@ -1,7 +1,9 @@
 package wincal.android.com.wincal;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
@@ -73,6 +76,7 @@ public class DatePickerFragment extends DialogFragment {
     private int mFinalMonth = 0;
 
     private int ACTION_MOVED=0;
+    private String mDialogTitle;
 
 
 
@@ -80,11 +84,18 @@ public class DatePickerFragment extends DialogFragment {
     @Override
     public View  onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+
+        getCurrentDate();
+        retrieveInitialArgs();
+        if (getDialog() != null) {
+            try {
+                setRetainInstance(true);
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+        }
 
         View view = inflater.inflate(R.layout.date_picker, container, false);
-        getCurrentDate();
-        findCalendarForCurrentMonth(mCurrentYear, mCurrentMonth + 1);
 
         mMonthListview = (ListView) view.findViewById(R.id.month_listview);
         mDateListView = (ListView) view.findViewById(R.id.date_listview);
@@ -138,6 +149,110 @@ public class DatePickerFragment extends DialogFragment {
 
     }
 
+    protected void retrieveInitialArgs(){
+
+        Bundle args=getArguments();
+        if(args!=null){
+
+            mCurrentMonth=args.getInt(Constants.MONTH,mCurrentMonth);
+            mCurrentYear=args.getInt(Constants.YEAR,mCurrentYear);
+            mCurrentDate=args.getInt(Constants.DATE,mCurrentDate);
+            mDialogTitle=args.getString(Constants.DIALOG_TITLE);
+
+        }
+        findCalendarForCurrentMonth(mCurrentYear, mCurrentMonth + 1);
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            if (mDialogTitle != null) {
+                dialog.setTitle(mDialogTitle);
+            } else {
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            }
+        }
+    }
+
+    /**
+     * Restore current states from savedInstanceState
+     *
+     * @param savedInstanceState
+     * @param key
+     */
+    public void restoreStatesFromKey(Bundle savedInstanceState, String key) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(key)) {
+            Bundle savedState = savedInstanceState.getBundle(key);
+            setArguments(savedState);
+        }
+    }
+
+
+    /**
+     * Restore state for dialog
+     *
+     * @param savedInstanceState
+     * @param key
+     * @param dialogTag
+     */
+    public void restoreDialogStatesFromKey(FragmentManager manager,
+                                           Bundle savedInstanceState, String key, String dialogTag) {
+        restoreStatesFromKey(savedInstanceState, key);
+
+        DatePickerFragment existingDialog = (DatePickerFragment) manager
+                .findFragmentByTag(dialogTag);
+        if (existingDialog != null) {
+            existingDialog.dismiss();
+            show(manager, dialogTag);
+        }
+    }
+
+    /**
+     * Save current state to bundle outState
+     *
+     * @param outState
+     * @param key
+     */
+    public void saveStatesToKey(Bundle outState, String key) {
+        outState.putBundle(key, getSavedStates());
+    }
+
+    /**
+     * Get current saved sates of the Calendar. Useful for handling rotation.
+     */
+    public Bundle getSavedStates() {
+
+        Bundle bundle = new Bundle();
+        int middlePosition=mMonthAdapter.getCurrentPos()-mMonthListview.getFirstVisiblePosition();
+        TextView monthView=(TextView)mMonthListview.getChildAt(middlePosition).findViewById(R.id.row_number);
+        TextView yearView=(TextView)mYearListView.getChildAt(middlePosition).findViewById(R.id.row_number);
+        TextView dateView=(TextView)mDateListView.getChildAt(middlePosition).findViewById(R.id.row_number);
+
+
+        bundle.putInt(Constants.MONTH, Integer.parseInt(monthView.getText().toString()));
+        bundle.putInt(Constants.YEAR, Integer.parseInt(yearView.getText().toString()));
+        bundle.putInt(Constants.DATE,Integer.parseInt(dateView.getText().toString()));
+        if(mDialogTitle!=null){
+            bundle.putString(Constants.DIALOG_TITLE,mDialogTitle);
+        }
+
+        return bundle;
+    }
+
+
+//A good way to initialize
+    public static DatePickerFragment newInstance(String dialogTitle, int month,
+                                               int year,int date) {
+       DatePickerFragment fragment = new DatePickerFragment();
+
+        Bundle args = new Bundle();
+        args.putString(Constants.DIALOG_TITLE, dialogTitle);
+        args.putInt(Constants.MONTH, month);
+        args.putInt(Constants.YEAR, year);
+        args.putInt(Constants.DATE,date);
+
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
 
     /**
      * returns the midlle position which has the highlight
@@ -158,8 +273,10 @@ public class DatePickerFragment extends DialogFragment {
     protected void getInitialAndFinalMonth(int position) {
 
         View middleView = mMonthListview.getChildAt(position);
-        TextView monthView = (TextView) middleView.findViewById(R.id.row_number);
-        mInitialMonth = Integer.parseInt(monthView.getText().toString());
+        if(middleView!=null) {
+            TextView monthView = (TextView) middleView.findViewById(R.id.row_number);
+            mInitialMonth = Integer.parseInt(monthView.getText().toString());
+        }
 
     }
 

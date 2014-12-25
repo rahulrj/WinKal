@@ -20,10 +20,10 @@ public class MainActivity extends FragmentActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         FragmentManager manager=getSupportFragmentManager();
 
-       //datePickerFragment.show(manager,"Dialog");
+       datePickerFragment.show(manager,"Dialog");
 
-        transaction.replace(R.id.container, datePickerFragment);
-        transaction.commit();
+        //transaction.replace(R.id.container, datePickerFragment);
+        //transaction.commit();
 
 
 

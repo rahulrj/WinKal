@@ -14,5 +14,11 @@ public class Constants {
     public static final int OFFSET_FOR_YEAR=23;
 
 
+    public static final String MONTH="month";
+    public static final String YEAR="year";
+    public static final String DATE="date";
+    public static final String DIALOG_TITLE="TITLE";
+
+
 
 }
