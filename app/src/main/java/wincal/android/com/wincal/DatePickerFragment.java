@@ -1,12 +1,15 @@
 package wincal.android.com.wincal;
 
 import android.app.Dialog;
+import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -30,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class DatePickerFragment extends DialogFragment {
 
 
+    private RelativeLayout mRootLayout;
     private ListView mMonthListview;
     private ListView mDateListView;
     private ListView mYearListView;
@@ -55,8 +59,6 @@ public class DatePickerFragment extends DialogFragment {
     private String[] daysOfTheMonth;
 
 
-
-
     private int currentMonthPosition;
     private AtomicBoolean mMonthListBeingTouched = new AtomicBoolean(false);
     private AtomicBoolean mYearListBeingTouched = new AtomicBoolean(false);
@@ -77,6 +79,7 @@ public class DatePickerFragment extends DialogFragment {
 
     private int ACTION_MOVED=0;
     private String mDialogTitle;
+
 
 
 
@@ -120,16 +123,16 @@ public class DatePickerFragment extends DialogFragment {
         mDateListView.setAdapter(mDateAdapter);
 
         setCurrentPositionsInListViews();
-        final RelativeLayout rootLayout = (RelativeLayout)view. findViewById(R.id.root_layout);
+         mRootLayout = (RelativeLayout)view. findViewById(R.id.root_layout);
 
 
-        ViewTreeObserver vto = rootLayout.getViewTreeObserver();
+        ViewTreeObserver vto = mRootLayout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
 
-                rootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                mRootLayoutHeight = rootLayout.getMeasuredHeight();
+                mRootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                mRootLayoutHeight = mRootLayout.getMeasuredHeight();
 
                 mMonthListview.setSelectionFromTop(mCurrentMonthPosition, mRootLayoutHeight / 3);
                 mYearListView.setSelectionFromTop(mCurrentYearPosition, mRootLayoutHeight / 3);
@@ -226,7 +229,7 @@ public class DatePickerFragment extends DialogFragment {
         TextView dateView=(TextView)mDateListView.getChildAt(middlePosition).findViewById(R.id.row_number);
 
 
-        bundle.putInt(Constants.MONTH, Integer.parseInt(monthView.getText().toString()));
+        bundle.putInt(Constants.MONTH, Integer.parseInt(monthView.getText().toString())-1);
         bundle.putInt(Constants.YEAR, Integer.parseInt(yearView.getText().toString()));
         bundle.putInt(Constants.DATE,Integer.parseInt(dateView.getText().toString()));
         if(mDialogTitle!=null){
@@ -263,11 +266,37 @@ public class DatePickerFragment extends DialogFragment {
             public void run() {
 
                 mMiddlePositionFromTop = mMonthAdapter.getCurrentPos() - mMonthListview.getFirstVisiblePosition();
+                putDummyViewInMiddle();
                 getInitialAndFinalMonth(mMiddlePositionFromTop);
 
             }
         });
 
+    }
+
+    private void putDummyViewInMiddle(){
+
+        View middleView=mDateListView.getChildAt(mMiddlePositionFromTop);
+        LayoutInflater inflater = (LayoutInflater)   getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View dummyView=inflater.inflate(R.layout.calendar_row,null);
+        dummyView.setLayoutParams(new RelativeLayout.LayoutParams(middleView.getWidth(),middleView.getHeight()));
+
+        int location[]=new int[2];
+        middleView.getLocationInWindow(location);
+        Log.d("rahul",""+location[1]+ " "+middleView.getY());
+        dummyView.setX(location[0]);
+        dummyView.setY(middleView.getY());
+
+        mRootLayout.addView(dummyView);
+
+
+    }
+
+    public static float convertDpToPixel(float dp, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = dp * (metrics.densityDpi / 160f);
+        return px;
     }
 
     protected void getInitialAndFinalMonth(int position) {
@@ -442,7 +471,6 @@ public class DatePickerFragment extends DialogFragment {
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
                 state.setScrollState(scrollState);
-
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get() && !mItemMovedToMiddle) {
 
                     listBeingTouched.set(true);
@@ -840,17 +868,21 @@ public class DatePickerFragment extends DialogFragment {
     }
 
 
+@Override
+    public void onDetach(){
 
+     super.onDetach();
+    try {
+        Field childFragmentManager = Fragment.class
+                .getDeclaredField("mChildFragmentManager");
+        childFragmentManager.setAccessible(true);
+        childFragmentManager.set(this, null);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    } catch (NoSuchFieldException e) {
+        throw new RuntimeException(e);
+    } catch (IllegalAccessException e) {
+        throw new RuntimeException(e);
     }
+
+ }
 }

@@ -15,31 +15,32 @@
         android:orientation="horizontal">
 
 
-    <ListView
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:id="@+id/month_listview"
-        android:scrollbars="none"
-        android:listSelector="@android:color/transparent"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="@dimen/listview_divider_height"
-       android:layout_marginLeft="@dimen/listview_left_margin"
-         ></ListView>
+            <ListView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/month_listview"
+                android:scrollbars="none"
+                android:listSelector="@android:color/transparent"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="@dimen/listview_divider_height"
+                android:layout_marginLeft="@dimen/listview_left_margin"
+                ></ListView>
 
-    <ListView
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:id="@+id/date_listview"
-        android:scrollbars="none"
-        android:listSelector="@android:color/transparent"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="@dimen/listview_divider_height"
-        android:layout_toEndOf="@+id/month_listview"
-        android:layout_marginLeft="@dimen/listview_left_margin"
 
-        ></ListView>
+        <ListView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/date_listview"
+            android:scrollbars="none"
+            android:listSelector="@android:color/transparent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="@dimen/listview_divider_height"
+            android:layout_marginLeft="@dimen/listview_left_margin"
+            ></ListView>
+
+
 
     <ListView
         android:layout_width="0dp"
@@ -50,7 +51,6 @@
         android:listSelector="@android:color/transparent"
         android:divider="@android:color/transparent"
         android:dividerHeight="@dimen/listview_divider_height"
-        android:layout_toEndOf="@+id/date_listview"
         android:layout_marginLeft="@dimen/listview_left_margin"
         android:layout_marginRight="@dimen/listview_right_margin"
 
