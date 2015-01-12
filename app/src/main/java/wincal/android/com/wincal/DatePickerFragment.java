@@ -141,6 +141,7 @@ public class DatePickerFragment extends DialogFragment {
                 setListenersOnListView(mMonthAdapter, mMonthListview, mMonthListBeingTouched, mScrollStateOfMonthView, mMonthViewVisible);
                 setListenersOnListView(mYearAdapter, mYearListView, mYearListBeingTouched, mScrollStateOfYearView, mYearViewVisible);
                 setListenersOnListView(mDateAdapter, mDateListView, mDateListBeingTouched, mScrollStateOfDayView, mDateViewVisible);
+                mDateListView.setVisibility(View.INVISIBLE);
 
                 getMiddlePosition();
 
@@ -289,7 +290,6 @@ public class DatePickerFragment extends DialogFragment {
 
         mRootLayout.addView(dummyView);
 
-
     }
 
     public static float convertDpToPixel(float dp, Context context){
@@ -366,7 +366,6 @@ public class DatePickerFragment extends DialogFragment {
         mMonthAdapter.setCurrentPos(mCurrentMonthPosition);
         mYearAdapter.setCurrentPos(mCurrentYearPosition);
         mDateAdapter.setCurrentPos(mCurrentDatePosition);
-
 
     }
 
@@ -462,6 +461,7 @@ public class DatePickerFragment extends DialogFragment {
 
 
         listView.setOnScrollListener(new OnScrollListener() {
+
 
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 

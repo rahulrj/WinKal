@@ -157,6 +157,7 @@ public class MonthYearAdapter extends BaseAdapter{
         else{
 
             mainText.setText(String.valueOf(Constants.STARTING_YEAR+actualPosition));
+            subText.setText("");
         }
 
 
