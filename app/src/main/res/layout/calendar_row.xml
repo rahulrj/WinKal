@@ -32,6 +32,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/row_text"
             android:text="January"
+            android:gravity="center"
             android:textSize="@dimen/row_text_font_size"
             android:textColor="@android:color/white"/>
         </LinearLayout>

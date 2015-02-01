@@ -3,6 +3,8 @@ package wincal.android.com.wincal;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -24,6 +26,7 @@ import android.widget.TextView;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -72,6 +75,9 @@ public class DatePickerFragment extends DialogFragment {
     private ListViewVisible mYearViewVisible;
     private ListViewVisible mDateViewVisible;
 
+    private View mDummyView;
+    private int mInitialPosition=0;
+
     private int mMiddlePositionFromTop;
 
     private int mInitialMonth = 0;
@@ -79,6 +85,11 @@ public class DatePickerFragment extends DialogFragment {
 
     private int ACTION_MOVED=0;
     private String mDialogTitle;
+
+    private int mFirstVisiblePosition;
+    private int mFirstVisiblePosition2;
+    private ColorDrawable mColorDrawable;
+
 
 
 
@@ -103,6 +114,7 @@ public class DatePickerFragment extends DialogFragment {
         mMonthListview = (ListView) view.findViewById(R.id.month_listview);
         mDateListView = (ListView) view.findViewById(R.id.date_listview);
         mYearListView = (ListView) view.findViewById(R.id.year_listview);
+        mColorDrawable = new ColorDrawable(Color.rgb(255, 255, 255));
 
         initializeObjects();
 
@@ -123,7 +135,7 @@ public class DatePickerFragment extends DialogFragment {
         mDateListView.setAdapter(mDateAdapter);
 
         setCurrentPositionsInListViews();
-         mRootLayout = (RelativeLayout)view. findViewById(R.id.root_layout);
+        mRootLayout = (RelativeLayout)view. findViewById(R.id.root_layout);
 
 
         ViewTreeObserver vto = mRootLayout.getViewTreeObserver();
@@ -269,6 +281,8 @@ public class DatePickerFragment extends DialogFragment {
                 mMiddlePositionFromTop = mMonthAdapter.getCurrentPos() - mMonthListview.getFirstVisiblePosition();
                 putDummyViewInMiddle();
                 getInitialAndFinalMonth(mMiddlePositionFromTop);
+                mFirstVisiblePosition=mMonthListview.getFirstVisiblePosition();
+                mFirstVisiblePosition2=mFirstVisiblePosition;
 
             }
         });
@@ -279,16 +293,29 @@ public class DatePickerFragment extends DialogFragment {
 
         View middleView=mDateListView.getChildAt(mMiddlePositionFromTop);
         LayoutInflater inflater = (LayoutInflater)   getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View dummyView=inflater.inflate(R.layout.calendar_row,null);
-        dummyView.setLayoutParams(new RelativeLayout.LayoutParams(middleView.getWidth(),middleView.getHeight()));
+        mDummyView=inflater.inflate(R.layout.calendar_row,null);
+        mDummyView.setLayoutParams(new RelativeLayout.LayoutParams(middleView.getWidth(),middleView.getHeight()));
 
         int location[]=new int[2];
         middleView.getLocationInWindow(location);
-        Log.d("rahul",""+location[1]+ " "+middleView.getY());
-        dummyView.setX(location[0]);
-        dummyView.setY(middleView.getY());
+        mDummyView.setX(location[0]);
+        mDummyView.setY(middleView.getY());
 
-        mRootLayout.addView(dummyView);
+        setDataInDummyView();
+
+        mRootLayout.addView(mDummyView);
+        mInitialPosition=middleView.getTop();
+
+    }
+
+    private void setDataInDummyView(){
+
+        Date date=new GregorianCalendar(mCurrentYear,mCurrentMonth,mCurrentDate).getTime();
+        String dayOfTheWeek=new SimpleDateFormat("EEEE").format(date);
+        ((TextView) mDummyView.findViewById(R.id.row_text)).setText(dayOfTheWeek);
+        ((TextView) mDummyView.findViewById(R.id.row_text)).setTextColor(mColorDrawable.getColor());
+        ((TextView) mDummyView.findViewById(R.id.row_number)).setText(String.format("%02d", mCurrentDate));
+
 
     }
 
@@ -345,7 +372,6 @@ public class DatePickerFragment extends DialogFragment {
 
         // mFirstWeekDayOfMonth=cal.get(Calendar.DAY_OF_WEEK);
         mNumberOfMonthDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-        Log.d("abc", "" + mNumberOfMonthDays + " " + currentMonth);
 
         daysOfTheMonth = new String[mNumberOfMonthDays];
         for (int i = 0; i < mNumberOfMonthDays; i++) {
@@ -461,13 +487,59 @@ public class DatePickerFragment extends DialogFragment {
 
 
         listView.setOnScrollListener(new OnScrollListener() {
-
-
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                Log.d("firstvisible",""+mFirstVisiblePosition+ " "+mMonthListview.getFirstVisiblePosition()+ " "+mMiddlePositionFromTop);
+                int position=-(mMonthListview.getFirstVisiblePosition()-mFirstVisiblePosition)+mMiddlePositionFromTop;
+                Log.d("position",""+position);
+                View c = view.getChildAt(position);
+                if(c!=null) {
+
+                    int heightOfView = c.getHeight()/2;
+                    if (c.getTop() != 0 && c.getTop() > 0) {
+
+                        fadeView(c.getTop(), heightOfView);
+                    }
+                }
+
+            }
+
+
+            public void fadeView(int top,int heightOfView){
+
+                int fadeFraction=findFadeFraction(top,heightOfView);
+                Log.d("fade",""+fadeFraction);
+                mColorDrawable.setAlpha(fadeFraction);
+               // ScaleAnimation scaleAnimation=new ScaleAnimation((float)1.0,(float)fadeFraction,(float)0.0,(float)fadeFraction,(float)0.5,(float)0.5);
+                TextView rowText=(TextView)mDummyView.findViewById(R.id.row_text);
+                if(fadeFraction==0){
+
+                    rowText.setTextColor(getResources().getColor(R.color.cal_background));
+                }
+                else {
+                    rowText.setTextColor(mColorDrawable.getColor());
+                }
+                //rowText.invalidate();
+               // rowText.setTextSize(TypedValue.COMPLEX_UNIT_SP,fadeFraction*14);
+               // rowText.setWidth((int)(rowText.getWidth()*fadeFraction));
+                //scaleAnimation.setFillAfter(true);
+                //rowText.startAnimation(scaleAnimation);
 
 
             }
 
+            public int findFadeFraction(int top,int heightOfView){
+
+               if(top>=mInitialPosition+heightOfView) {
+
+                   mInitialPosition=top;
+                   return 0;
+               }
+                else if(top==mInitialPosition)
+                   return 255;
+               return  (int)((255.0/top*4)*mInitialPosition);
+
+            }
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
                 state.setScrollState(scrollState);
@@ -482,9 +554,7 @@ public class DatePickerFragment extends DialogFragment {
             }
         });
 
-
     }
-
 
     protected void addDatesInDateView() {
 
@@ -605,7 +675,7 @@ public class DatePickerFragment extends DialogFragment {
             View v = listView.getChildAt(i);
             if (v != null) {
 
-                // Rect viewRect=new Rect();
+                // f viewRect=new Rect();
                 // v.getGlobalVisibleRect(viewRect);
                 if (yValue >= v.getTop() - listView.getDividerHeight() && yValue <= v.getBottom()) {
 
