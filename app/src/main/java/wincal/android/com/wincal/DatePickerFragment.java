@@ -92,6 +92,7 @@ public class DatePickerFragment extends DialogFragment {
     private ColorDrawable mColorDrawable;
     private boolean mLowerHalf=false;
     private int mDateInDummyView;
+    private int mPositionForAnimation;
 
 
 
@@ -308,7 +309,7 @@ public class DatePickerFragment extends DialogFragment {
 
         mRootLayout.addView(mDummyView);
         mInitialPosition=middleView.getTop();
-        mInitialMonthForDummyView=((TextView)(mMonthListview.getChildAt(mMiddlePositionFromTop).findViewById(R.id.row_text))).getText().toString();
+        mInitialMonthForDummyView=((TextView)(getMiddleView(mMonthListview,0).findViewById(R.id.row_text))).getText().toString();
 
     }
 
@@ -496,10 +497,10 @@ public class DatePickerFragment extends DialogFragment {
               //  Log.d("firstvisible",""+mFirstVisiblePosition+ " "+mMonthListview.getFirstVisiblePosition()+ " "+mMiddlePositionFromTop);
 
                 //Log.d("first",""+mMonthListview.getFirstVisiblePosition());
-                int position=-(mMonthListview.getFirstVisiblePosition()-mFirstVisiblePosition)+mMiddlePositionFromTop;
+               int position=-(mMonthListview.getFirstVisiblePosition()-mFirstVisiblePosition)+mMiddlePositionFromTop;
 
                 TextView view1=(TextView)mMonthListview.getChildAt(0).findViewById(R.id.row_text);
-                Log.d("day",""+view1.getText().toString()+ " "+position);
+             //   Log.d("day",""+view1.getText().toString()+ " "+position);
               //  Log.d("position",""+position);
                 View c = view.getChildAt(position);
                 if(c!=null) {
@@ -507,7 +508,7 @@ public class DatePickerFragment extends DialogFragment {
                     int heightOfView = c.getHeight()/2;
                     if (c.getTop() != 0 && c.getTop() > 0) {
 
-                        fadeView(c.getTop(), heightOfView);
+                        fadeView(c.getTop(), heightOfView,state);
                     }
                 }
 
@@ -532,17 +533,20 @@ public class DatePickerFragment extends DialogFragment {
     }
 
 
-    public void fadeView(int top,int heightOfView){
+    public void fadeView(int top,int heightOfView,ScrollState state){
 
         int fadeFraction=0;
-        if(!mLowerHalf) {
-            fadeFraction = findFadeFraction(top, heightOfView);
+        if(!mLowerHalf ) {
+            fadeFraction = findFadeFraction(top, heightOfView,state);
         }
         else{
 
-            fadeFraction=findFadeFractionLower(top,heightOfView );
+            fadeFraction=findFadeFractionLower(top,heightOfView,state );
         }
-       // Log.d("fade",""+fadeFraction);
+        Log.d("fade",""+fadeFraction);
+//        if(fadeFraction>255){
+//            fadeFraction=255;
+//        }
         mColorDrawable.setAlpha(fadeFraction);
         // ScaleAnimation scaleAnimation=new ScaleAnimation((float)1.0,(float)fadeFraction,(float)0.0,(float)fadeFraction,(float)0.5,(float)0.5);
         TextView rowText=(TextView)mDummyView.findViewById(R.id.row_text);
@@ -562,18 +566,22 @@ public class DatePickerFragment extends DialogFragment {
 
     }
 
-    public int findFadeFraction(int top,int heightOfView){
+    public int findFadeFraction(int top,int heightOfView,ScrollState state){
 
-        if(top>=mInitialPosition+heightOfView) {
+            Log.d("top",""+top+ " "+mInitialPosition);
 
-           // mInitialPosition=top;
-           mLowerHalf=true;
-            setNewDayOfWeek();
-            return 0;
-        }
-        else if(top==mInitialPosition)
-            return 255;
-        return  (int)((255.0/top*4)*mInitialPosition);
+            if (top >= mInitialPosition + heightOfView && !mInitialMonthForDummyView.equalsIgnoreCase(((TextView)(getMiddleView(mMonthListview,0).findViewById(R.id.row_text))).getText().toString())) {
+
+                mInitialPosition = top;
+                mLowerHalf = true;
+                mInitialMonthForDummyView = ((TextView) (getMiddleView(mMonthListview, 0).findViewById(R.id.row_text))).getText().toString();
+                setNewDayOfWeek();
+                return 0;
+            } else if (top == mInitialPosition)
+                return (255* 4);
+           // return (int)(255.0/(top*2.3) * mInitialPosition);
+            return (int) ((255.0 /top*4 *( mInitialPosition)));
+
 
     }
 
@@ -581,8 +589,8 @@ public class DatePickerFragment extends DialogFragment {
     private void setNewDayOfWeek(){
 
         TextView view1=(TextView)mMonthListview.getChildAt(0).findViewById(R.id.row_text);
-        Log.d("day2",""+view1.getText().toString());
-        //Toast.makeText(getActivity(), ""+view.getText().toString(), Toast.LENGTH_SHORT).show();
+       // Log.d("day2",""+view1.getText().toString());
+        //Toast.makeText(getActivity(), ""+view1.getText().toString(), Toast.LENGTH_SHORT).show();
 
         //Log.d("count0",""+(TextView)(mMonthListview.getChildAt(0).findViewById(R.id.row_text)));
         //Log.d("count1",""+mMonthListview.getFirstVisiblePosition());
@@ -597,21 +605,25 @@ public class DatePickerFragment extends DialogFragment {
         ((TextView) mDummyView.findViewById(R.id.row_text)).setText(new SimpleDateFormat("EEEE").format(date));
 
         //Toast.makeText(getActivity(),""+new SimpleDateFormat("EEEE").format(date),Toast.LENGTH_SHORT).show();
-        //Toast.makeText(getActivity(),""+mMiddlePositionFromTop+ " "+month,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(),""+mMiddlePositionFromTop+ " "+month, Toast.LENGTH_SHORT).show();
 
 
     }
 
-    public int findFadeFractionLower(int top,int heightOfView){
+    public int findFadeFractionLower(int top,int heightOfView,ScrollState state){
 
         if(top>=mInitialPosition+heightOfView) {
 
-            mLowerHalf=false;
-            return 255;
+                mLowerHalf=false;
+                mInitialPosition=getMiddleView(mMonthListview,mMiddlePositionFromTop).getTop();
+                mFirstVisiblePosition=mMonthListview.getFirstVisiblePosition();
+               // Log.d("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",""+mInitialPosition);
+                return 255*4;
+
         }
         else if(top==mInitialPosition)
             return 0;
-        return  (int)((255.0/mInitialPosition*4)*top);
+        return  (int)(((top*4.0)/mInitialPosition)*(255.0));
 
     }
 
