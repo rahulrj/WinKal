@@ -77,6 +77,7 @@ public class DatePickerFragment extends DialogFragment {
 
     private View mDummyView;
     private int mInitialPosition=0;
+    private int mStartingPositionOfScroll;
     private String mInitialMonthForDummyView;
     //private int mInitialMonth;
 
@@ -92,7 +93,7 @@ public class DatePickerFragment extends DialogFragment {
     private ColorDrawable mColorDrawable;
     private boolean mLowerHalf=false;
     private int mDateInDummyView;
-    private int mPositionForAnimation;
+    private int mInitialTop;
 
 
 
@@ -309,6 +310,7 @@ public class DatePickerFragment extends DialogFragment {
 
         mRootLayout.addView(mDummyView);
         mInitialPosition=middleView.getTop();
+        mStartingPositionOfScroll=mInitialPosition;
         mInitialMonthForDummyView=((TextView)(getMiddleView(mMonthListview,0).findViewById(R.id.row_text))).getText().toString();
 
     }
@@ -566,11 +568,12 @@ public class DatePickerFragment extends DialogFragment {
 
     }
 
+
     public int findFadeFraction(int top,int heightOfView,ScrollState state){
 
             Log.d("top",""+top+ " "+mInitialPosition);
 
-            if (top >= mInitialPosition + heightOfView && !mInitialMonthForDummyView.equalsIgnoreCase(((TextView)(getMiddleView(mMonthListview,0).findViewById(R.id.row_text))).getText().toString())) {
+            if (Math.abs(top- mInitialPosition)>= heightOfView && !mInitialMonthForDummyView.equalsIgnoreCase(((TextView)(getMiddleView(mMonthListview,0).findViewById(R.id.row_text))).getText().toString())) {
 
                 mInitialPosition = top;
                 mLowerHalf = true;
@@ -578,9 +581,12 @@ public class DatePickerFragment extends DialogFragment {
                 setNewDayOfWeek();
                 return 0;
             } else if (top == mInitialPosition)
-                return (255* 4);
+                return (255*4);
            // return (int)(255.0/(top*2.3) * mInitialPosition);
-            return (int) ((255.0 /top*4 *( mInitialPosition)));
+            //return (int) ((255.0 /top*4 *( mInitialPosition)));
+
+
+             return (int) ((255.0* 4*mInitialPosition )/(Math.abs(top-mInitialPosition)+mInitialPosition));
 
 
     }
@@ -612,18 +618,19 @@ public class DatePickerFragment extends DialogFragment {
 
     public int findFadeFractionLower(int top,int heightOfView,ScrollState state){
 
-        if(top>=mInitialPosition+heightOfView) {
+        if(Math.abs(top-mInitialPosition)>=heightOfView) {
 
                 mLowerHalf=false;
-                mInitialPosition=getMiddleView(mMonthListview,mMiddlePositionFromTop).getTop();
+               // mInitialPosition=getMiddleView(mMonthListview,mMiddlePositionFromTop).getTop();
+                mInitialPosition=mStartingPositionOfScroll;
                 mFirstVisiblePosition=mMonthListview.getFirstVisiblePosition();
-               // Log.d("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",""+mInitialPosition);
                 return 255*4;
 
         }
         else if(top==mInitialPosition)
             return 0;
-        return  (int)(((top*4.0)/mInitialPosition)*(255.0));
+       // return  (int)(((top*4.0)/mInitialPosition)*(255.0));
+        return  (int)((mInitialPosition+Math.abs(top-mInitialPosition)*4.0/mInitialPosition)*255.0);
 
     }
 
