@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +18,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
@@ -110,6 +112,8 @@ public class DatePickerFragment extends DialogFragment {
    private AtomicInteger mInitialPositionYear=new AtomicInteger(0);
    private int mStartingPositionOfScrollMonth;
    private int mStartingPositionOfScrollYear;
+
+    private Handler mHandler=new Handler();
 
 
     @Override
@@ -458,6 +462,11 @@ public class DatePickerFragment extends DialogFragment {
 
                     }
 
+                    if(listView.getId()==R.id.year_listview){
+                        showAnimation();
+                    }
+
+
 //                    if(mMonthOrYearTouched && listView.getId()==R.id.date_listview){
 //                        hideDummyViewAndPutDates();
 //                        mMonthOrYearTouched=false;
@@ -549,7 +558,7 @@ public class DatePickerFragment extends DialogFragment {
 
                 if (listView.getId() != R.id.date_listview) {
                     int position = -(listView.getFirstVisiblePosition() - firstVisiblePosition.get()) + mMiddlePositionFromTop;
-                    //Log.d("rahull", "" + mMiddlePositionFromTop);
+                   // Log.d("rahull", "" + listView.getFirstVisiblePosition()+ " "+firstVisiblePosition.get()+ " "+position);
 
                     View c = listView.getChildAt(position);
                     if (c != null) {
@@ -582,6 +591,19 @@ public class DatePickerFragment extends DialogFragment {
 
     }
 
+
+    private void showAnimation(){
+
+       CustomAnimController lac = new CustomAnimController(getActivity(), AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in), 0.3f);
+        //CustomAnimController lac = new CustomAnimController(getActivity(),null, 0.3f);
+        lac.setMiddlePosition(mMiddlePositionFromTop);
+
+        mYearListView.setLayoutAnimation(lac);
+
+
+    }
+
+
     private void hideDummyViewAndPutDates(){
 
         View yearView=getMiddleView(mMonthListview,mMiddlePositionFromTop);
@@ -613,7 +635,7 @@ public class DatePickerFragment extends DialogFragment {
 
             fadeFraction=findFadeFractionLower(top,heightOfView,listView,firstVisiblePosition,lowerHalf,initialPosition,startingPositionForScroll);
         }
-        //Log.d("fademain", "" + fadeFraction);
+      //  Log.d("fademain", "" + fadeFraction);
 //        if(fadeFraction>255){
 //            fadeFraction=255;
 //        }
@@ -646,7 +668,7 @@ public class DatePickerFragment extends DialogFragment {
                 initialPosition.set(top);
                 lowerHalf.set(true);
                 firstVisibleText.delete(0,firstVisibleText.length());
-                firstVisibleText.append(((TextView) (getMiddleView(listView, 0).findViewById(R.id.row_text))).getText().toString());
+                firstVisibleText.append(((TextView) (getMiddleView(listView, 0).findViewById(id))).getText().toString());
                 setNewDayOfWeek(listView);
                 return 0;
             } else if (top == initialPosition.get())
@@ -671,6 +693,8 @@ public class DatePickerFragment extends DialogFragment {
 
         Date date=new GregorianCalendar(year,month-1,mDateInDummyView).getTime();
         ((TextView) mDummyView.findViewById(R.id.row_text)).setText(new SimpleDateFormat("EEEE").format(date));
+
+
 
         //Toast.makeText(getActivity(),""+new SimpleDateFormat("EEEE").format(date),Toast.LENGTH_SHORT).show();
         //Toast.makeText(getActivity(),""+mMiddlePositionFromTop+ " "+month, Toast.LENGTH_SHORT).show();
@@ -727,7 +751,7 @@ public class DatePickerFragment extends DialogFragment {
                   View dateView=getMiddleView(mDateListView,mMiddlePositionFromTop);
                   int date=Integer.parseInt(((TextView)dateView.findViewById(R.id.row_number)).getText().toString());
                   int dateOnDummyView=Integer.parseInt(((TextView)mDummyView.findViewById(R.id.row_number)).getText().toString());
-                  Toast.makeText(getActivity(),""+date+" "+dateOnDummyView+" "+mMiddlePositionFromTop+" "+mDateListView.getFirstVisiblePosition(),Toast.LENGTH_SHORT).show();
+                 // Toast.makeText(getActivity(),""+date+" "+dateOnDummyView+" "+mMiddlePositionFromTop+" "+mDateListView.getFirstVisiblePosition(),Toast.LENGTH_SHORT).show();
                   if(dateOnDummyView>date)
                       mDelta=dateOnDummyView-date;
                   else

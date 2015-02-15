@@ -32,6 +32,7 @@ public class MonthYearAdapter extends BaseAdapter{
 
     private int mCurrentMonth;
     private int mCurrentYear;
+    int t=0;
 
 
     public MonthYearAdapter(Context context, String[] data,int length,boolean forDateView) {
@@ -181,6 +182,14 @@ public class MonthYearAdapter extends BaseAdapter{
 
         }
 
+//      if(isForDateView) {
+//          Animation animation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+//          animation.setDuration(t);
+//
+//          vi.startAnimation(animation);
+//          Log.d("rahul",""+animation.getDuration());
+//          t = t + 100;
+//      }
 
         return vi;
     }
