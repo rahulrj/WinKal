@@ -6,10 +6,10 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,6 +21,7 @@ import android.view.Window;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -52,6 +53,7 @@ public class DatePickerFragment extends DialogFragment {
     private int mCurrentMonth;
     private int mCurrentYear;
     private int mCurrentDate;
+    private int mCurrentDummyDate;
     private int mCurrentYearPosition;
     private int mCurrentMonthPosition;
     private int mCurrentDatePosition;
@@ -113,12 +115,14 @@ public class DatePickerFragment extends DialogFragment {
    private int mStartingPositionOfScrollMonth;
    private int mStartingPositionOfScrollYear;
 
-    private Handler mHandler=new Handler();
+   private ActionBar mActionBar;
+   private DateSelectListener mDateSelectListener;
 
 
     @Override
     public View  onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+
 
         getCurrentDate();
         retrieveInitialArgs();
@@ -188,6 +192,40 @@ public class DatePickerFragment extends DialogFragment {
 
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mActionBar=((MainActivity)getActivity()).getSupportActionBar();
+        setClickListenerOnActionBar(mActionBar);
+
+    }
+
+    public void setDateSelectListener(DateSelectListener dateSelectListener){
+
+            this.mDateSelectListener=dateSelectListener;
+    }
+
+    public void setClickListenerOnActionBar(ActionBar actionbar){
+
+        ImageView done=(ImageView)mActionBar.getCustomView().findViewById(R.id.done);
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                View monthView=getMiddleView(mMonthListview,mMiddlePositionFromTop);
+                View yearView=getMiddleView(mYearListView,mMiddlePositionFromTop);
+                View dateView=getMiddleView(mDateListView,mMiddlePositionFromTop);
+
+                int month=(Integer.parseInt(((TextView)monthView.findViewById(R.id.row_number)).getText().toString()));
+                int year=(Integer.parseInt(((TextView)yearView.findViewById(R.id.row_number)).getText().toString()));
+                int date=(Integer.parseInt(((TextView)dateView.findViewById(R.id.row_number)).getText().toString()));
+
+                mDateSelectListener.onSelectDate(date,month,year);
+            }
+        });
+    }
+
 
     private void setAllListeners(){
 
@@ -208,6 +246,7 @@ public class DatePickerFragment extends DialogFragment {
             mCurrentMonth=args.getInt(Constants.MONTH,mCurrentMonth);
             mCurrentYear=args.getInt(Constants.YEAR,mCurrentYear);
             mCurrentDate=args.getInt(Constants.DATE,mCurrentDate);
+            mCurrentDummyDate=args.getInt(Constants.DUMMY_DATE,mCurrentDummyDate);
             mDialogTitle=args.getString(Constants.DIALOG_TITLE);
 
         }
@@ -276,11 +315,13 @@ public class DatePickerFragment extends DialogFragment {
         TextView monthView=(TextView)mMonthListview.getChildAt(middlePosition).findViewById(R.id.row_number);
         TextView yearView=(TextView)mYearListView.getChildAt(middlePosition).findViewById(R.id.row_number);
         TextView dateView=(TextView)mDateListView.getChildAt(middlePosition).findViewById(R.id.row_number);
+        TextView dummyView=(TextView)mDummyView.findViewById(R.id.row_number);
 
 
         bundle.putInt(Constants.MONTH, Integer.parseInt(monthView.getText().toString())-1);
         bundle.putInt(Constants.YEAR, Integer.parseInt(yearView.getText().toString()));
         bundle.putInt(Constants.DATE,Integer.parseInt(dateView.getText().toString()));
+        bundle.putInt(Constants.DUMMY_DATE, Integer.parseInt(dummyView.getText().toString()));
         if(mDialogTitle!=null){
             bundle.putString(Constants.DIALOG_TITLE,mDialogTitle);
         }
@@ -359,12 +400,21 @@ public class DatePickerFragment extends DialogFragment {
 
     private void setDataInDummyView(){
 
-        Date date=new GregorianCalendar(mCurrentYear,mCurrentMonth,mCurrentDate).getTime();
+        int temporaryDate;
+        if(mCurrentDummyDate!=0){
+            temporaryDate=mCurrentDummyDate;
+        }
+        else{
+            temporaryDate=mCurrentDate;
+        }
+
+         Date date=new GregorianCalendar(mCurrentYear,mCurrentMonth,temporaryDate).getTime();
+
         String dayOfTheWeek=new SimpleDateFormat("EEEE").format(date);
         ((TextView) mDummyView.findViewById(R.id.row_text)).setText(dayOfTheWeek);
         ((TextView) mDummyView.findViewById(R.id.row_text)).setTextColor(mColorDrawable.getColor());
-        ((TextView) mDummyView.findViewById(R.id.row_number)).setText(String.format("%02d", mCurrentDate));
-        mDummyView.setBackgroundColor(getResources().getColor(R.color.selected_row_color));
+        ((TextView) mDummyView.findViewById(R.id.row_number)).setText(String.format("%02d", temporaryDate));
+        mDummyView.setBackgroundColor(getResources().getColor(R.color.material_selected_row_color));
 
 
     }
@@ -578,6 +628,11 @@ public class DatePickerFragment extends DialogFragment {
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
                 state.setScrollState(scrollState);
+                mActionBar.getCustomView().findViewById(R.id.done).setVisibility(View.GONE);
+                if(scrollState==OnScrollListener.SCROLL_STATE_IDLE){
+
+                    mActionBar.getCustomView().findViewById(R.id.done).setVisibility(View.VISIBLE);
+                }
                 if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get() && !mItemMovedToMiddle) {
 
                     listBeingTouched.set(true);

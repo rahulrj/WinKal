@@ -164,11 +164,17 @@ public class MonthYearAdapter extends BaseAdapter{
 
         if(position==currentPos ){
 
-
             vi.setVisibility(View.VISIBLE);
             //if(highlightCurrentMonth)
-                     vi.setBackgroundColor(context.getResources().getColor(R.color.selected_row_color));
+                     vi.setBackgroundColor(context.getResources().getColor(R.color.material_selected_row_color));
+                        //vi.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.list_border_selected));
+
            // highlightCurrentMonth=false;
+        }
+        else{
+
+            ((TextView) vi.findViewById(R.id.row_text)).setTextColor(context.getResources().getColor(R.color.material_text_color));
+            ((TextView) vi.findViewById(R.id.row_number)).setTextColor(context.getResources().getColor(R.color.material_text_color));
         }
 
         if (isForDateView){

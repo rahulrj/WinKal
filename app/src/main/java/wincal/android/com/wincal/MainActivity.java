@@ -1,22 +1,29 @@
 package wincal.android.com.wincal;
 
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
+import android.widget.Toast;
 
 /**
  * Created by Rahul Raja on 12/24/2014.
  */
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends ActionBarActivity {
 
     private DatePickerFragment mDatePickerFragment;
     private DatePickerFragment mDatePickerDialogFragment;
+
+    private int mSelectedMonth;
+    private int mSelectedYear;
+    private int mSelectedDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setUpTitleBar();
 
        /* Code for dialog*/
 //        mDatePickerDialogFragment=new DatePickerFragment();
@@ -43,7 +50,33 @@ public class MainActivity extends FragmentActivity {
 
 
 
+        DateSelectListener dateSelectListener=new DateSelectListener() {
+            @Override
+            public void onSelectDate(int date, int month, int year) {
 
+                mSelectedDate=date;
+                mSelectedMonth=month;
+                mSelectedYear=year;
+
+                Toast.makeText(MainActivity.this,""+month+" "+year+" "+date,Toast.LENGTH_LONG).show();
+            }
+        };
+
+        mDatePickerFragment.setDateSelectListener(dateSelectListener);
+
+    }
+
+    private void setUpTitleBar(){
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setHomeButtonEnabled(false);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.action_bar_color)));
+
+        getSupportActionBar().setCustomView(R.layout.custom_action_bar);
+        //mOverflowMenu=(ImageView)getSupportActionBar().getCustomView().findViewById(R.id.overflow_menu);
     }
 
     @Override
