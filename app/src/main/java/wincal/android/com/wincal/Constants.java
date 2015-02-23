@@ -12,6 +12,7 @@ public class Constants {
     public static final int ENDING_YEAR=2100;
     public static final int OFFSET_FOR_MONTH=3;
     public static final int OFFSET_FOR_YEAR=23;
+    public static final String MIDDLE_POSITION="middle_pos";
 
 
     public static final String MONTH="month";

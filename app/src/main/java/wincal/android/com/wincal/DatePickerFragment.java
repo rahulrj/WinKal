@@ -145,11 +145,11 @@ public class DatePickerFragment extends DialogFragment {
 
         //mMonthListview.setClickable(true);
         String monthNames[] = getResources().getStringArray(R.array.month_names);
-        mMonthAdapter = new MonthYearAdapter(getActivity(), monthNames, monthNames.length, Constants.NOT_FOR_DATE_VIEW);
+        mMonthAdapter = new MonthYearAdapter(getActivity(), monthNames, monthNames.length, Constants.NOT_FOR_DATE_VIEW,mMonthListview);
         mMonthAdapter.setAllItemsVisible(true);
 
-        mYearAdapter = new MonthYearAdapter(getActivity(), null, Constants.NO_OF_YEARS, Constants.NOT_FOR_DATE_VIEW);
-        mDateAdapter = new MonthYearAdapter(getActivity(), daysOfTheMonth, daysOfTheMonth.length, Constants.FOR_DATE_VIEW);
+        mYearAdapter = new MonthYearAdapter(getActivity(), null, Constants.NO_OF_YEARS, Constants.NOT_FOR_DATE_VIEW,mYearListView);
+        mDateAdapter = new MonthYearAdapter(getActivity(), daysOfTheMonth, daysOfTheMonth.length, Constants.FOR_DATE_VIEW,mDateListView);
         mDateAdapter.setCurrentMonth(mCurrentMonth);
         mDateAdapter.setCurrentYear(mCurrentYear);
         mYearAdapter.setAllItemsVisible(false);
@@ -356,6 +356,7 @@ public class DatePickerFragment extends DialogFragment {
 //            public void run() {
 
                 mMiddlePositionFromTop = mMonthAdapter.getCurrentPos() - mMonthListview.getFirstVisiblePosition();
+                mDateAdapter.mMiddlePositionFromTop=mMiddlePositionFromTop;
                 putDummyViewInMiddle();
                 getInitialAndFinalMonth(mMiddlePositionFromTop);
                 mFirstVisiblePositionMonth.set(mMonthListview.getFirstVisiblePosition());
@@ -513,7 +514,7 @@ public class DatePickerFragment extends DialogFragment {
                     }
 
                     if(listView.getId()==R.id.year_listview){
-                        showAnimation();
+                        //showAnimation();
                     }
 
 
@@ -649,11 +650,20 @@ public class DatePickerFragment extends DialogFragment {
 
     private void showAnimation(){
 
-       CustomAnimController lac = new CustomAnimController(getActivity(), AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in), 0.3f);
+       CustomAnimController lac = new CustomAnimController(getActivity(), AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in), 0.3f,false);
         //CustomAnimController lac = new CustomAnimController(getActivity(),null, 0.3f);
         lac.setMiddlePosition(mMiddlePositionFromTop);
 
         mYearListView.setLayoutAnimation(lac);
+
+        if(lac.isDone()) {
+
+//        CustomAnimController lac2= new CustomAnimController(getActivity(), AnimationUtils.loadAnimation(getActivity(), R.anim.fade_in_lower), 0.3f,true);
+//        //CustomAnimController lac = new CustomAnimController(getActivity(),null, 0.3f);
+//        lac2.setMiddlePosition(mMiddlePositionFromTop);
+//
+//        mYearListView.setLayoutAnimation(lac2);
+        }
 
 
     }

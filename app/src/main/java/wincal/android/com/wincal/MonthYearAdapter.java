@@ -1,10 +1,14 @@
 package wincal.android.com.wincal;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -32,14 +36,20 @@ public class MonthYearAdapter extends BaseAdapter{
 
     private int mCurrentMonth;
     private int mCurrentYear;
-    int t=0;
+    long mAnimationOffset=0;
+
+    // Used for animating the listview
+    public   static int mMiddlePositionFromTop;
+    private ListView mListView;
 
 
-    public MonthYearAdapter(Context context, String[] data,int length,boolean forDateView) {
+    public MonthYearAdapter(Context context, String[] data,int length,boolean forDateView,ListView listView) {
         // TODO Auto-generated constructor stub
         this.context = context;
         this.data = data;
         this.isForDateView=forDateView;
+        this.mListView=listView;
+        this.mMiddlePositionFromTop=0;
         if(data!=null)
             this.dataLength=data.length;
         else
@@ -57,6 +67,7 @@ public class MonthYearAdapter extends BaseAdapter{
 
     }
 
+
     public boolean getHighlightCurrentMonth(){
 
         return this.highlightCurrentMonth;
@@ -70,6 +81,7 @@ public class MonthYearAdapter extends BaseAdapter{
     protected void setAllItemsVisible(boolean choice){
 
         this.alIItemsVisible=choice;
+        mAnimationOffset=0;
     }
 
     protected void  setCurrentPos(int pos){
@@ -188,14 +200,33 @@ public class MonthYearAdapter extends BaseAdapter{
 
         }
 
-//      if(isForDateView) {
-//          Animation animation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-//          animation.setDuration(t);
-//
-//          vi.startAnimation(animation);
-//          Log.d("rahul",""+animation.getDuration());
-//          t = t + 100;
-//      }
+       if (getAllItemsVisible()) {
+
+           Log.d("rahul","midl"+mMiddlePositionFromTop);
+           if(mMiddlePositionFromTop!=0 && position!=mMiddlePositionFromTop+mListView.getFirstVisiblePosition()) {
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+                for (int i = 1; i < 10; i++) {
+
+                    if (position == mListView.getFirstVisiblePosition() + mMiddlePositionFromTop - i) {
+                        mAnimationOffset = (20 * i);
+                        animation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+                        break;
+                    } else if (position == mListView.getFirstVisiblePosition() + mMiddlePositionFromTop + i) {
+                        mAnimationOffset = (20 * i);
+                        animation = AnimationUtils.loadAnimation(context, R.anim.fade_in_lower);
+                        break;
+                    }
+                }
+
+               Log.d("rahul","come");
+                if (position != mMiddlePositionFromTop + mListView.getFirstVisiblePosition()) {
+                    animation.setDuration(100);
+                    animation.setStartOffset(mAnimationOffset);
+                    vi.startAnimation(animation);
+                }
+            }
+
+        }
 
         return vi;
     }
