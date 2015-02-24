@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import java.util.GregorianCalendar;
 import java.util.IllegalFormatConversionException;
 import java.util.IllegalFormatException;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Rahul Raja on 9/25/2014.
@@ -41,6 +43,8 @@ public class MonthYearAdapter extends BaseAdapter{
     // Used for animating the listview
     public   static int mMiddlePositionFromTop;
     private ListView mListView;
+    private DatePickerFragment.ScrollState mScrollState;
+    private AtomicBoolean mListViewBeingTouched=new AtomicBoolean(false);
 
 
     public MonthYearAdapter(Context context, String[] data,int length,boolean forDateView,ListView listView) {
@@ -67,6 +71,15 @@ public class MonthYearAdapter extends BaseAdapter{
 
     }
 
+    protected void setScrollState(DatePickerFragment.ScrollState scrollState){
+
+        this.mScrollState=scrollState;
+    }
+
+    public void setTouchedParam(AtomicBoolean listViewTouched){
+
+        this.mListViewBeingTouched=listViewTouched;
+    }
 
     public boolean getHighlightCurrentMonth(){
 
@@ -177,11 +190,12 @@ public class MonthYearAdapter extends BaseAdapter{
         if(position==currentPos ){
 
             vi.setVisibility(View.VISIBLE);
-            //if(highlightCurrentMonth)
+           // if(highlightCurrentMonth)
                      vi.setBackgroundColor(context.getResources().getColor(R.color.material_selected_row_color));
                         //vi.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.list_border_selected));
 
-           // highlightCurrentMonth=false;
+
+            //highlightCurrentMonth=false;
         }
         else{
 
@@ -200,9 +214,10 @@ public class MonthYearAdapter extends BaseAdapter{
 
         }
 
-       if (getAllItemsVisible()) {
+        Log.d("touch",""+mListViewBeingTouched.get());
+       if (getAllItemsVisible() && mScrollState!=null && mScrollState.getScrollState()== AbsListView.OnScrollListener.SCROLL_STATE_IDLE && mListViewBeingTouched.get()) {
 
-           Log.d("rahul","midl"+mMiddlePositionFromTop);
+
            if(mMiddlePositionFromTop!=0 && position!=mMiddlePositionFromTop+mListView.getFirstVisiblePosition()) {
                 Animation animation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
                 for (int i = 1; i < 10; i++) {
@@ -218,7 +233,7 @@ public class MonthYearAdapter extends BaseAdapter{
                     }
                 }
 
-               Log.d("rahul","come");
+              // Log.d("rahul","come");
                 if (position != mMiddlePositionFromTop + mListView.getFirstVisiblePosition()) {
                     animation.setDuration(100);
                     animation.setStartOffset(mAnimationOffset);
