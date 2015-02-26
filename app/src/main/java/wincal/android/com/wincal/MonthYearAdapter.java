@@ -1,7 +1,6 @@
 package wincal.android.com.wincal;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -134,6 +133,8 @@ public class MonthYearAdapter extends BaseAdapter{
 
         int actualPosition=position%dataLength;
         return data[actualPosition];
+
+
     }
 
     @Override
@@ -214,7 +215,7 @@ public class MonthYearAdapter extends BaseAdapter{
 
         }
 
-        Log.d("touch",""+mListViewBeingTouched.get());
+        //Log.d("touch",""+mListViewBeingTouched.get());
        if (getAllItemsVisible() && mScrollState!=null && mScrollState.getScrollState()== AbsListView.OnScrollListener.SCROLL_STATE_IDLE && mListViewBeingTouched.get()) {
 
 
