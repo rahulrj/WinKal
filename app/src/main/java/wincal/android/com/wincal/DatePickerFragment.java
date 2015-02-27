@@ -6,12 +6,12 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,7 +26,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -118,8 +117,10 @@ public class DatePickerFragment extends DialogFragment {
 
    private ActionBar mActionBar;
    private DateSelectListener mDateSelectListener;
-   int mFadeIncrement=1;
-   int mFadeLowerIncrement=1;
+   private Handler mHandler;
+    private Runnable mStatusChecker;
+    private Runnable mScrollDownTask;
+    private Runnable mScrollUpTask;
 
 
     @Override
@@ -129,6 +130,7 @@ public class DatePickerFragment extends DialogFragment {
 
         getCurrentDate();
         retrieveInitialArgs();
+        mHandler=new Handler();
         if (getDialog() != null) {
             try {
                 setRetainInstance(true);
@@ -627,7 +629,7 @@ public class DatePickerFragment extends DialogFragment {
 
                 if (listView.getId() != R.id.date_listview) {
                     int position = -(listView.getFirstVisiblePosition() - firstVisiblePosition.get()) + mMiddlePositionFromTop;
-                   Log.d("rahull", "" + listView.getFirstVisiblePosition() + " " + firstVisiblePosition.get() + " " + position);
+                  // Log.d("rahull", "" + listView.getFirstVisiblePosition() + " " + firstVisiblePosition.get() + " " + position);
 
                     View c = listView.getChildAt(position);
                     if (c != null) {
@@ -639,6 +641,9 @@ public class DatePickerFragment extends DialogFragment {
                         }
                     }
 
+                }
+                else{
+                   // mDummyView.setVisibility(View.INVISIBLE);
                 }
             }
 
@@ -699,7 +704,7 @@ public class DatePickerFragment extends DialogFragment {
         findCalendarForCurrentMonth(year,month);
         mDateAdapter.notifyDataSetChanged();
 
-        Toast.makeText(getActivity(),""+mDateAdapter.getCurrentPos(),Toast.LENGTH_LONG).show();
+        //Toast.makeText(getActivity(),""+mDateAdapter.getCurrentPos(),Toast.LENGTH_LONG).show();
         View dateView=getMiddleView(mDateListView,mMiddlePositionFromTop);
         int date=Integer.parseInt(((TextView)dateView.findViewById(R.id.row_number)).getText().toString());
         int dateOnDummyView=Integer.parseInt(((TextView)mDummyView.findViewById(R.id.row_number)).getText().toString());
@@ -840,14 +845,21 @@ public class DatePickerFragment extends DialogFragment {
 
     }
 
-    protected void setNewDatesInDateAdapter(int year, int month) {
 
 
-          mDateAdapter.setNewDateParameters(daysOfTheMonth);
-          mDateAdapter.setCurrentMonth(month - 1);
-          mDateAdapter.setCurrentYear(year);
+    private void setDateParams(int year,int month){
 
-          mDateAdapter.notifyDataSetChanged();
+        mDateAdapter.setNewDateParameters(daysOfTheMonth);
+        mDateAdapter.setCurrentMonth(month - 1);
+        mDateAdapter.setCurrentYear(year);
+        mDateAdapter.notifyDataSetChanged();
+    }
+
+    protected void setNewDatesInDateAdapter(final int year, final int month) {
+
+
+          setDateParams(year,month);
+
           mDateListView.post(new Runnable() {
               @Override
               public void run() {
@@ -855,7 +867,7 @@ public class DatePickerFragment extends DialogFragment {
                   View dateView=getMiddleView(mDateListView,mMiddlePositionFromTop);
                   int date=Integer.parseInt(((TextView)dateView.findViewById(R.id.row_number)).getText().toString());
                   int dateOnDummyView=Integer.parseInt(((TextView)mDummyView.findViewById(R.id.row_number)).getText().toString());
-                 // Toast.makeText(getActivity(),""+date+" "+dateOnDummyView+" "+mMiddlePositionFromTop+" "+mDateListView.getFirstVisiblePosition(),Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(getActivity(),""+date+" "+dateOnDummyView+" "+mMiddlePositionFromTop+" "+mDateListView.getFirstVisiblePosition(),Toast.LENGTH_SHORT).show();
                   if(dateOnDummyView>date)
                       mDelta=dateOnDummyView-date;
                   else
@@ -865,7 +877,28 @@ public class DatePickerFragment extends DialogFragment {
                       @Override
                       public void run() {
 
-                          mDateListView.setSelectionFromTop((mDelta + mMiddlePositionFromTop) + mDateListView.getFirstVisiblePosition(), mRootLayoutHeight / 3);
+                          int position=(mDelta + mMiddlePositionFromTop) + mDateListView.getFirstVisiblePosition();
+                          //mDateListView.setSelectionFromTop(position, mRootLayoutHeight / 3);
+
+                          mDateAdapter.setCurrentPos(position);
+                          mDateAdapter.notifyDataSetChanged();
+                          mDateListView.setSelectionFromTop(position, mRootLayoutHeight / 3);
+
+//                          View view=mDateAdapter.getView(position,null,mDateListView);
+//                          TextView v=(TextView)view.findViewById(R.id.row_number);
+//                          Log.d("rah",""+v.getText().toString());
+//                          view.setBackgroundColor(getResources().getColor(R.color.material_selected_row_color));
+//                          setDateParams(year,month);
+//                          mDateAdapter.notifyDataSetChanged();
+
+
+                        //  Log.d("rahulpos",""+(position-mDateListView.getFirstVisiblePosition()));
+//                          mDateListView.getChildAt(position-mDateListView.getFirstVisiblePosition()).setBackgroundColor(getResources().getColor(R.color.material_selected_row_color));
+//                          mDateAdapter.notifyDataSetChanged();
+//                          mDateAdapter.setCurrentPos(position);
+//                          mDateAdapter.notifyDataSetChanged();
+
+
 
                       }
                   });
@@ -1097,38 +1130,43 @@ public class DatePickerFragment extends DialogFragment {
                     mBottomPositionOfMiddleElement = mRootLayoutHeight / 3 + v.getHeight();
                 }
 
-                /// Log.d("A",""+v.getTop()+ " "+mRootLayoutHeight/3+ " "+mMiddlePositionInScreen);
-                if ((v.getTop() >= mRootLayoutHeight / 3) && v.getTop() < mMiddlePositionInScreen) {
-                    scrollUp(v.getTop(), listView, adapter, listView.getFirstVisiblePosition() + i);
+                //if(listView.getId()==R.id.year_listview)
+                 //Log.d("A",""+i+" "+v.getTop()+ " "+mRootLayoutHeight/3+ " "+mMiddlePositionInScreen);
+                if ((v.getTop() >= mRootLayoutHeight / 3-listView.getDividerHeight()/2) && v.getTop() < mMiddlePositionInScreen) {
+                    scrollUp(listView,v,v.getTop(), listView, adapter, listView.getFirstVisiblePosition() + i);
                     break;
                 }
 
-                // Log.d("B",""+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mBottomPositionOfMiddleElement);
-                if ((v.getBottom() >= mMiddlePositionInScreen) && v.getBottom() < mBottomPositionOfMiddleElement) {
+                //if(listView.getId()==R.id.year_listview)
+                //Log.d("B",""+i+" "+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mBottomPositionOfMiddleElement);
+                if ((v.getBottom() >= mMiddlePositionInScreen) && v.getBottom() <=mBottomPositionOfMiddleElement+listView.getDividerHeight()/2) {
 
-                    // Log.d("rahulrajayes",""+v.getBottom()+" "+mMiddlePositionInScreen+" "+mBottomPositionOfMiddleElement);
-                    scrollDown(v.getBottom(), v.getHeight(), listView, adapter, listView.getFirstVisiblePosition() + i);
+                    //if(listView.getId()==R.id.year_listview)
+                  //   Log.d("rahulrajayes",""+i+" "+v.getBottom()+" "+mMiddlePositionInScreen+" "+mBottomPositionOfMiddleElement);
+                    scrollDown(listView,v, v.getBottom(), v.getHeight(), listView, adapter, listView.getFirstVisiblePosition() + i);
                     break;
                 }
 
-
-                // Log.d("C",""+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mRootLayoutHeight/3+ " "+(v.getBottom()+listView.getDividerHeight()/2));
+                //if(listView.getId()==R.id.year_listview)
+                //Log.d("C",""+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mRootLayoutHeight/3+ " "+(v.getBottom()+listView.getDividerHeight()/2));
                 if (v.getBottom() <= mMiddlePositionInScreen && v.getBottom() > mRootLayoutHeight / 3) {
 
                     if (v.getBottom() + listView.getDividerHeight() / 2 >= mMiddlePositionInScreen) {
-//                        Log.d("rahulraja",""+v.getBottom()+" "+mMiddlePositionInScreen+" "+mRootLayoutHeight/3);
-                        scrollDown(v.getBottom(), v.getHeight(), listView, adapter, listView.getFirstVisiblePosition() + i);
+                      //  if(listView.getId()==R.id.year_listview)
+                       // Log.d("rahulraja",""+i+" "+v.getBottom()+" "+mMiddlePositionInScreen+" "+mRootLayoutHeight/3);
+                        scrollDown(listView,v, v.getBottom(), v.getHeight(), listView, adapter, listView.getFirstVisiblePosition() + i);
                         break;
                     }
 
                 }
 
-                //Log.d("D",""+v.getTop()+ " "+mMiddlePositionInScreen+ " "+mBottomPositionOfMiddleElement+" "+(v.getTop()-listView.getDividerHeight()/2));
+                //if(listView.getId()==R.id.year_listview)
+                //Log.d("D",""+i+" "+v.getTop()+ " "+mMiddlePositionInScreen+ " "+mBottomPositionOfMiddleElement+" "+(v.getTop()-listView.getDividerHeight()/2));
 
                 if (v.getTop() >= mMiddlePositionInScreen && v.getTop() < mBottomPositionOfMiddleElement) {
 
                     if (v.getTop() - listView.getDividerHeight() / 2 <= mMiddlePositionInScreen) {
-                        scrollUp(v.getTop(), listView, adapter, listView.getFirstVisiblePosition() + i);
+                        scrollUp(listView,v,v.getTop(), listView, adapter, listView.getFirstVisiblePosition() + i);
                         break;
                     }
 
@@ -1141,14 +1179,28 @@ public class DatePickerFragment extends DialogFragment {
 
     }
 
-    private void scrollDown(final int viewBottom, final int viewHeight, final ListView listView, final MonthYearAdapter adapter, final int currentPosInMiddle) {
+    private void scrollDown(final ListView listview,final View view,final int viewBottom, final int viewHeight, final ListView listView, final MonthYearAdapter adapter, final int currentPosInMiddle) {
 
+//        if(mScrollDownTask!=null) {
+//            listView.removeCallbacks(mScrollDownTask);
+//        }
+//        mScrollDownTask=new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                listView.smoothScrollBy(viewBottom - (mRootLayoutHeight / 3 + viewHeight), 1000);
+//                highLightMiddleRow(view,adapter, currentPosInMiddle,listView);
+//            }
+//        };
+//
+//        listView.post(mScrollDownTask);
         listView.post(new Runnable() {
             @Override
             public void run() {
                 // Log.d("rahulrajadown","gonedown"+v.getBottom());
                 listView.smoothScrollBy(viewBottom - (mRootLayoutHeight / 3 + viewHeight), 1000);
-                highLightMiddleRow(adapter, currentPosInMiddle);
+                highLightMiddleRow(listview,view,adapter, currentPosInMiddle);
+               // listView.removeCallbacks(this);
 
             }
         });
@@ -1156,29 +1208,77 @@ public class DatePickerFragment extends DialogFragment {
     }
 
 
-    private void scrollUp(final int viewTop, final ListView listView, final MonthYearAdapter adapter, final int currentPosInMiddle) {
+    private void scrollUp(ListView listview,final View view,final int viewTop, final ListView listView, final MonthYearAdapter adapter, final int currentPosInMiddle) {
 
+//        if(mScrollUpTask!=null)
+//          listView.removeCallbacks(mScrollUpTask);
+//        mScrollUpTask=new Runnable() {
+//            @Override
+//            public void run() {
+//
+//
+//
+//
+//            }
+//        };
+        //listView.post(mScrollUpTask);
         listView.post(new Runnable() {
             @Override
             public void run() {
                 // Log.d("rahulraja","goneup"+v.getTop());
+
                 listView.smoothScrollBy(viewTop - mRootLayoutHeight / 3, 1000);
-                highLightMiddleRow(adapter, currentPosInMiddle);
+                highLightMiddleRow(listView,view,adapter, currentPosInMiddle);
+              //  listView.removeCallbacks(this);
 
             }
         });
 
     }
 
-    private void highLightMiddleRow(MonthYearAdapter adapter, int currentPosInMiddle) {
+    private void highLightMiddleRow(ListView listview,View view,MonthYearAdapter adapter, int currentPosInMiddle) {
 
         adapter.setCurrentPos(currentPosInMiddle);
         //adapter.highlightCurrentMonthColor(true);
         adapter.notifyDataSetChanged();
+        if(listview.getId()==R.id.date_listview)
+            showDummyView(view);
 //        if(listView.getId()==R.id.date_listview){
 //            mDummyView.setVisibility(View.VISIBLE);
 //        }
 
+
+    }
+
+    private void showDummyView(final View view){
+
+        mStatusChecker = new Runnable() {
+            @Override
+            public void run() {
+
+               // Log.d("rahul", "" + view.getTop() + " " + mRootLayoutHeight / 3);
+                if(view.getTop()!=mRootLayoutHeight/3) {
+                    mHandler.postDelayed(mStatusChecker, 200);
+                }
+                else{
+                    mDummyView.setVisibility(View.VISIBLE);
+                    putDataOnDummyView();
+                    mHandler.removeCallbacks(mStatusChecker);
+                }
+            }
+        };
+        mStatusChecker.run();
+
+    }
+
+    private void putDataOnDummyView(){
+
+        View dateView=getMiddleView(mDateListView,mMiddlePositionFromTop);
+        String date=((TextView)dateView.findViewById(R.id.row_number)).getText().toString();
+        String day=((TextView)dateView.findViewById(R.id.row_text)).getText().toString();
+
+        ((TextView)mDummyView.findViewById(R.id.row_number)).setText(date);
+        ((TextView)mDummyView.findViewById(R.id.row_text)).setText(day);
 
     }
 

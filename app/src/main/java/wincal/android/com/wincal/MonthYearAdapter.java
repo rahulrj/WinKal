@@ -188,6 +188,9 @@ public class MonthYearAdapter extends BaseAdapter{
         }
 
 
+//        TextView vv=(TextView)vi.findViewById(R.id.row_number);
+//        if(mListView.getId()==R.id.date_listview)
+//            Log.d("pos",""+position+" "+currentPos+" "+vv.getText().toString());
         if(position==currentPos ){
 
             vi.setVisibility(View.VISIBLE);
@@ -215,7 +218,6 @@ public class MonthYearAdapter extends BaseAdapter{
 
         }
 
-        //Log.d("touch",""+mListViewBeingTouched.get());
        if (getAllItemsVisible() && mScrollState!=null && mScrollState.getScrollState()== AbsListView.OnScrollListener.SCROLL_STATE_IDLE && mListViewBeingTouched.get()) {
 
 
