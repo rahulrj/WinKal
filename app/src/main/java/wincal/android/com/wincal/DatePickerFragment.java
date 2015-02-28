@@ -122,6 +122,10 @@ public class DatePickerFragment extends DialogFragment {
     private Runnable mScrollDownTask;
     private Runnable mScrollUpTask;
 
+    private AtomicBoolean itemScrolledToMiddleMonth=new AtomicBoolean(false);
+    private AtomicBoolean itemScrolledToMiddleDate=new AtomicBoolean(false);
+    private AtomicBoolean itemScrolledToMiddleYear=new AtomicBoolean(false);
+
 
     @Override
     public View  onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -236,9 +240,9 @@ public class DatePickerFragment extends DialogFragment {
 
         //Log.d("rahul",""+mDummyView+" "+mFirstVisibleMonth+" "+mFirstVisibleYear);
         //Toast.makeText(getActivity(),""+abc+" "+mFirstVisiblePositionMonth+" "+mFirstVisiblePositionYear, Toast.LENGTH_LONG).show();
-        setListenersOnListView(mMonthAdapter, mMonthListview, mMonthListBeingTouched, mScrollStateOfMonthView, mMonthViewVisible, mFirstVisiblePositionMonth, mLowerHalfMonth, mInitialPositionMonth, mStartingPositionOfScrollMonth, mFirstVisibleMonth);
-        setListenersOnListView(mYearAdapter, mYearListView, mYearListBeingTouched, mScrollStateOfYearView, mYearViewVisible,mFirstVisiblePositionYear,mLowerHalfYear,mInitialPositionYear,mStartingPositionOfScrollYear,mFirstVisibleYear);
-        setListenersOnListView(mDateAdapter, mDateListView, mDateListBeingTouched, mScrollStateOfDayView, mDateViewVisible,new AtomicInteger(0),new AtomicBoolean(),new AtomicInteger(0),0,null);
+        setListenersOnListView(mMonthAdapter, mMonthListview, mMonthListBeingTouched, mScrollStateOfMonthView, mMonthViewVisible, mFirstVisiblePositionMonth, mLowerHalfMonth, mInitialPositionMonth, mStartingPositionOfScrollMonth, mFirstVisibleMonth,itemScrolledToMiddleMonth);
+        setListenersOnListView(mYearAdapter, mYearListView, mYearListBeingTouched, mScrollStateOfYearView, mYearViewVisible,mFirstVisiblePositionYear,mLowerHalfYear,mInitialPositionYear,mStartingPositionOfScrollYear,mFirstVisibleYear,itemScrolledToMiddleYear);
+        setListenersOnListView(mDateAdapter, mDateListView, mDateListBeingTouched, mScrollStateOfDayView, mDateViewVisible,new AtomicInteger(0),new AtomicBoolean(),new AtomicInteger(0),0,null,itemScrolledToMiddleDate);
         //mDateListView.setVisibility(View.INVISIBLE);
 
     }
@@ -524,7 +528,7 @@ public class DatePickerFragment extends DialogFragment {
     }
 
 
-    private void setListenersOnListView(final MonthYearAdapter adapter, final ListView listView, final AtomicBoolean listBeingTouched, final ScrollState state, final ListViewVisible completeListVisible, final AtomicInteger firstVisiblePosition, final AtomicBoolean lowerHalf, final AtomicInteger initialPosition, final int startingPositionOfScroll, final StringBuilder firstVisibleText) {
+    private void setListenersOnListView(final MonthYearAdapter adapter, final ListView listView, final AtomicBoolean listBeingTouched, final ScrollState state, final ListViewVisible completeListVisible, final AtomicInteger firstVisiblePosition, final AtomicBoolean lowerHalf, final AtomicInteger initialPosition, final int startingPositionOfScroll, final StringBuilder firstVisibleText, final AtomicBoolean itemScrolledToMiddle) {
 
         state.setScrollState(OnScrollListener.SCROLL_STATE_IDLE);
         listView.setOnTouchListener(new OnTouchListener() {
@@ -542,8 +546,11 @@ public class DatePickerFragment extends DialogFragment {
                         mDummyView.setVisibility(View.INVISIBLE);
                     }
 
+                    itemScrolledToMiddle.set(false);
 
-                    mItemMovedToMiddle=false;
+//                    mItemMovedToMiddle=false;
+//                    if(listView.getId()==R.id.year_listview)
+//                    Log.d("itemmoved",""+mItemMovedToMiddle);
                     if(ACTION_MOVED==1) {
                         if (state.getScrollState() == OnScrollListener.SCROLL_STATE_TOUCH_SCROLL || state.getScrollState() == OnScrollListener.SCROLL_STATE_FLING)
                             ACTION_MOVED = 1;
@@ -658,11 +665,22 @@ public class DatePickerFragment extends DialogFragment {
                     mActionBar.getCustomView().findViewById(R.id.done).setVisibility(View.VISIBLE);
                    // mDummyView.setVisibility(View.VISIBLE);
                 }
-                if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get() && !mItemMovedToMiddle) {
+
+//                if(listView.getId()==R.id.month_listview){
+//
+//                    Log.d("stats",""+scrollState+" "+listBeingTouched.get()+" "+itemScrolledToMiddle);
+//                }
+                if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && !listBeingTouched.get()) {
 
                    // listBeingTouched.set(true);
                     putSomeRowInMiddle(listView, adapter);
-                    mItemMovedToMiddle=true;
+//                    if(listView.getId()==R.id.month_listview) {
+//                        String s1 = ((TextView) listView.getChildAt(1).findViewById(R.id.row_number)).getText().toString();
+//                        String s2 = ((TextView) listView.getChildAt(2).findViewById(R.id.row_number)).getText().toString();
+//                        Log.d("values",s1+" "+s2);
+//                    }
+                    //mItemMovedToMiddle=true;
+                    itemScrolledToMiddle.set(true);
 
                 }
 
@@ -1119,63 +1137,65 @@ public class DatePickerFragment extends DialogFragment {
         adapter.notifyDataSetChanged();
     }
 
-    private void putSomeRowInMiddle(ListView listView, MonthYearAdapter adapter) {
 
-        for (int i = 0; i <= listView.getLastVisiblePosition() - listView.getFirstVisiblePosition(); i++) {
-            final View v = listView.getChildAt(i);
-            if (v != null) {
+    private synchronized void putSomeRowInMiddle(ListView listView, MonthYearAdapter adapter) {
 
-                if (mMiddlePositionInScreen == 0) {
-                    mMiddlePositionInScreen = mRootLayoutHeight / 3 + v.getHeight() / 2;
-                    mBottomPositionOfMiddleElement = mRootLayoutHeight / 3 + v.getHeight();
-                }
 
-                //if(listView.getId()==R.id.year_listview)
-                 //Log.d("A",""+i+" "+v.getTop()+ " "+mRootLayoutHeight/3+ " "+mMiddlePositionInScreen);
-                if ((v.getTop() >= mRootLayoutHeight / 3-listView.getDividerHeight()/2) && v.getTop() < mMiddlePositionInScreen) {
-                    scrollUp(listView,v,v.getTop(), listView, adapter, listView.getFirstVisiblePosition() + i);
-                    break;
-                }
+            for (int i = 0; i <= listView.getLastVisiblePosition() - listView.getFirstVisiblePosition(); i++) {
+                final View v = listView.getChildAt(i);
+                if (v != null) {
 
-                //if(listView.getId()==R.id.year_listview)
-                //Log.d("B",""+i+" "+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mBottomPositionOfMiddleElement);
-                if ((v.getBottom() >= mMiddlePositionInScreen) && v.getBottom() <=mBottomPositionOfMiddleElement+listView.getDividerHeight()/2) {
+                    if (mMiddlePositionInScreen == 0) {
+                        mMiddlePositionInScreen = mRootLayoutHeight / 3 + v.getHeight() / 2;
+                        mBottomPositionOfMiddleElement = mRootLayoutHeight / 3 + v.getHeight();
+                    }
 
                     //if(listView.getId()==R.id.year_listview)
-                  //   Log.d("rahulrajayes",""+i+" "+v.getBottom()+" "+mMiddlePositionInScreen+" "+mBottomPositionOfMiddleElement);
-                    scrollDown(listView,v, v.getBottom(), v.getHeight(), listView, adapter, listView.getFirstVisiblePosition() + i);
-                    break;
-                }
-
-                //if(listView.getId()==R.id.year_listview)
-                //Log.d("C",""+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mRootLayoutHeight/3+ " "+(v.getBottom()+listView.getDividerHeight()/2));
-                if (v.getBottom() <= mMiddlePositionInScreen && v.getBottom() > mRootLayoutHeight / 3) {
-
-                    if (v.getBottom() + listView.getDividerHeight() / 2 >= mMiddlePositionInScreen) {
-                      //  if(listView.getId()==R.id.year_listview)
-                       // Log.d("rahulraja",""+i+" "+v.getBottom()+" "+mMiddlePositionInScreen+" "+mRootLayoutHeight/3);
-                        scrollDown(listView,v, v.getBottom(), v.getHeight(), listView, adapter, listView.getFirstVisiblePosition() + i);
+                    //Log.d("A",""+i+" "+v.getTop()+ " "+mRootLayoutHeight/3+ " "+mMiddlePositionInScreen);
+                    if ((v.getTop() >= mRootLayoutHeight / 3 - listView.getDividerHeight() / 2) && v.getTop() < mMiddlePositionInScreen) {
+                        scrollUp(listView, v, v.getTop(), listView, adapter, listView.getFirstVisiblePosition() + i);
                         break;
                     }
 
-                }
+                    //if(listView.getId()==R.id.year_listview)
+                    //Log.d("B",""+i+" "+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mBottomPositionOfMiddleElement);
+                    if ((v.getBottom() >= mMiddlePositionInScreen) && v.getBottom() <= mBottomPositionOfMiddleElement + listView.getDividerHeight() / 2) {
 
-                //if(listView.getId()==R.id.year_listview)
-                //Log.d("D",""+i+" "+v.getTop()+ " "+mMiddlePositionInScreen+ " "+mBottomPositionOfMiddleElement+" "+(v.getTop()-listView.getDividerHeight()/2));
-
-                if (v.getTop() >= mMiddlePositionInScreen && v.getTop() < mBottomPositionOfMiddleElement) {
-
-                    if (v.getTop() - listView.getDividerHeight() / 2 <= mMiddlePositionInScreen) {
-                        scrollUp(listView,v,v.getTop(), listView, adapter, listView.getFirstVisiblePosition() + i);
+                        //if(listView.getId()==R.id.year_listview)
+                        //   Log.d("rahulrajayes",""+i+" "+v.getBottom()+" "+mMiddlePositionInScreen+" "+mBottomPositionOfMiddleElement);
+                        scrollDown(listView, v, v.getBottom(), v.getHeight(), listView, adapter, listView.getFirstVisiblePosition() + i);
                         break;
                     }
 
-                }
+                    //if(listView.getId()==R.id.year_listview)
+                    //Log.d("C",""+v.getBottom()+ " "+mMiddlePositionInScreen+ " "+mRootLayoutHeight/3+ " "+(v.getBottom()+listView.getDividerHeight()/2));
+                    if (v.getBottom() <= mMiddlePositionInScreen && v.getBottom() > mRootLayoutHeight / 3) {
 
+                        if (v.getBottom() + listView.getDividerHeight() / 2 >= mMiddlePositionInScreen) {
+                            //  if(listView.getId()==R.id.year_listview)
+                            // Log.d("rahulraja",""+i+" "+v.getBottom()+" "+mMiddlePositionInScreen+" "+mRootLayoutHeight/3);
+                            scrollDown(listView, v, v.getBottom(), v.getHeight(), listView, adapter, listView.getFirstVisiblePosition() + i);
+                            break;
+                        }
+
+                    }
+
+                    //if(listView.getId()==R.id.year_listview)
+                    //Log.d("D",""+i+" "+v.getTop()+ " "+mMiddlePositionInScreen+ " "+mBottomPositionOfMiddleElement+" "+(v.getTop()-listView.getDividerHeight()/2));
+
+                    if (v.getTop() >= mMiddlePositionInScreen && v.getTop() < mBottomPositionOfMiddleElement) {
+
+                        if (v.getTop() - listView.getDividerHeight() / 2 <= mMiddlePositionInScreen) {
+                            scrollUp(listView, v, v.getTop(), listView, adapter, listView.getFirstVisiblePosition() + i);
+                            break;
+                        }
+
+                    }
+
+
+                }
 
             }
-
-        }
 
     }
 
@@ -1198,8 +1218,11 @@ public class DatePickerFragment extends DialogFragment {
             @Override
             public void run() {
                 // Log.d("rahulrajadown","gonedown"+v.getBottom());
-                listView.smoothScrollBy(viewBottom - (mRootLayoutHeight / 3 + viewHeight), 1000);
                 highLightMiddleRow(listview,view,adapter, currentPosInMiddle);
+                listView.smoothScrollBy(viewBottom - (mRootLayoutHeight / 3 + viewHeight), 1000);
+//                if(listview.getId()==R.id.month_listview)
+//                    Log.d("rahuldown",""+viewBottom);
+
                // listView.removeCallbacks(this);
 
             }
@@ -1208,7 +1231,7 @@ public class DatePickerFragment extends DialogFragment {
     }
 
 
-    private void scrollUp(ListView listview,final View view,final int viewTop, final ListView listView, final MonthYearAdapter adapter, final int currentPosInMiddle) {
+    private void scrollUp(final ListView listview,final View view,final int viewTop, final ListView listView, final MonthYearAdapter adapter, final int currentPosInMiddle) {
 
 //        if(mScrollUpTask!=null)
 //          listView.removeCallbacks(mScrollUpTask);
@@ -1227,8 +1250,11 @@ public class DatePickerFragment extends DialogFragment {
             public void run() {
                 // Log.d("rahulraja","goneup"+v.getTop());
 
-                listView.smoothScrollBy(viewTop - mRootLayoutHeight / 3, 1000);
                 highLightMiddleRow(listView,view,adapter, currentPosInMiddle);
+                listView.smoothScrollBy(viewTop - mRootLayoutHeight / 3, 1000);
+//                if(listview.getId()==R.id.month_listview)
+//                    Log.d("rahulup",""+viewTop);
+
               //  listView.removeCallbacks(this);
 
             }
@@ -1238,6 +1264,8 @@ public class DatePickerFragment extends DialogFragment {
 
     private void highLightMiddleRow(ListView listview,View view,MonthYearAdapter adapter, int currentPosInMiddle) {
 
+//        if(listview.getId()==R.id.month_listview)
+//            Log.d("midldle",""+currentPosInMiddle);
         adapter.setCurrentPos(currentPosInMiddle);
         //adapter.highlightCurrentMonthColor(true);
         adapter.notifyDataSetChanged();

@@ -187,10 +187,11 @@ public class MonthYearAdapter extends BaseAdapter{
             subText.setText("");
         }
 
-
-//        TextView vv=(TextView)vi.findViewById(R.id.row_number);
-//        if(mListView.getId()==R.id.date_listview)
-//            Log.d("pos",""+position+" "+currentPos+" "+vv.getText().toString());
+//            if(position==currentPos) {
+//                TextView vv = (TextView) vi.findViewById(R.id.row_number);
+//                if (mListView.getId() == R.id.year_listview)
+//                    Log.d("pos", "" + position + " " + currentPos + " " + vv.getText().toString());
+//            }
         if(position==currentPos ){
 
             vi.setVisibility(View.VISIBLE);
