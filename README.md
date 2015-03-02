@@ -28,9 +28,8 @@ The main Fragment used here is ```DatePickerFragment```. So to set it up on an A
  ```mDatePickerFragment=new DatePickerFragment();
         if(savedInstanceState!=null){
 
-            mDatePickerFragment.restoreStatesFromKey(savedInstanceState,"CALENDAR_SAVED_STATE");
-        }
-
+         
+        
 transaction.replace(R.id.container, mDatePickerFragment);
 transaction.commit();```
 
