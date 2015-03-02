@@ -26,6 +26,7 @@ project,specify ```compile project(':WinKal')``` in the build.gradle file.
 The picker can be used as a ```Fragment``` or as a ```DialogFragment.```
 The Activity that i have used in the sample app is an ActionBarActivity. I have put the "Done" button on it. In general, the activity should have an ActionBar in it in any case, otherwise the central selected element will change its position. 
 
+### Setting as a Fragment
 The main Fragment used here is ```DatePickerFragment.``` So to set it up on an Activity( the activity should have an ActionBar in it, just use the following code. The following code will set up the DatePicker with Today's date on it.
 ```
 mDatePickerFragment=new DatePickerFragment();
@@ -41,13 +42,21 @@ Calendar cal = Calendar.getInstance();
 args.putInt(Constants.MONTH, cal.get(Calendar.MONTH) + 1);
 args.putInt(Constants.YEAR, cal.get(Calendar.YEAR));
 args.putInt(Constants.DATE, cal.get(Calendar.DAY_OF_MONTH));
-caldroidFragment.setArguments(args);
+dpFragment.setArguments(args);
 
 FragmentTransaction t = getSupportFragmentManager().beginTransaction();
-t.replace(R.id.calendar1, caldroidFragment);
+t.replace(R.id.container,dpFragment);
 t.commit();
 ```
 
+
+### Setting as a DialogFragment
+
+### Getting the values back from it
+
+### Customization 
+
+### Handling rotation 
 
 
 
