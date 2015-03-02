@@ -39,6 +39,11 @@ public class MonthYearAdapter extends BaseAdapter{
     private int mCurrentYear;
     long mAnimationOffset=0;
 
+    private int mSelectedRowBackground;
+    private int mListRowTextColor;
+    private int  mSelectedRowTextColor;
+    private int mListRowBackground;
+
     // Used for animating the listview
     public   static int mMiddlePositionFromTop;
     private ListView mListView;
@@ -68,6 +73,14 @@ public class MonthYearAdapter extends BaseAdapter{
          this.data=data;
          this.dataLength=data.length;
 
+    }
+
+    protected void setColorValues(int listRowTextColor,int selectedRowTextColor,int selectedRowBackground,int listRowBackground){
+
+        mSelectedRowTextColor=selectedRowTextColor;
+        mListRowTextColor=listRowTextColor;
+        mSelectedRowBackground=selectedRowBackground;
+        mListRowBackground=listRowBackground;
     }
 
     protected void setScrollState(DatePickerFragment.ScrollState scrollState){
@@ -152,7 +165,7 @@ public class MonthYearAdapter extends BaseAdapter{
         else {
             if(vi.getVisibility()==View.INVISIBLE)
                 vi.setVisibility(View.VISIBLE);
-            vi.setBackgroundResource(R.drawable.list_border);
+            vi.setBackgroundResource(mListRowBackground);
         }
 
      //   vi.setTag(""+position);
@@ -187,25 +200,23 @@ public class MonthYearAdapter extends BaseAdapter{
             subText.setText("");
         }
 
-//            if(position==currentPos) {
-//                TextView vv = (TextView) vi.findViewById(R.id.row_number);
-//                if (mListView.getId() == R.id.year_listview)
-//                    Log.d("pos", "" + position + " " + currentPos + " " + vv.getText().toString());
-//            }
         if(position==currentPos ){
 
             vi.setVisibility(View.VISIBLE);
-           // if(highlightCurrentMonth)
-                     vi.setBackgroundColor(context.getResources().getColor(R.color.material_selected_row_color));
-                        //vi.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.list_border_selected));
+            vi.setBackgroundResource(mSelectedRowBackground);
+            ((TextView) vi.findViewById(R.id.row_text)).setTextColor(mSelectedRowTextColor);
+            ((TextView) vi.findViewById(R.id.row_number)).setTextColor(mSelectedRowTextColor);
+           // vi.setBackgroundColor(context.getResources().getColor(R.color.material_selected_row_color));
 
 
-            //highlightCurrentMonth=false;
         }
         else{
 
-            ((TextView) vi.findViewById(R.id.row_text)).setTextColor(context.getResources().getColor(R.color.material_text_color));
-            ((TextView) vi.findViewById(R.id.row_number)).setTextColor(context.getResources().getColor(R.color.material_text_color));
+
+          //  ((TextView) vi.findViewById(R.id.row_text)).setTextColor(context.getResources().getColor(R.color.material_text_color));
+          //  ((TextView) vi.findViewById(R.id.row_number)).setTextColor(context.getResources().getColor(R.color.material_text_color));
+              ((TextView) vi.findViewById(R.id.row_text)).setTextColor(mListRowTextColor);
+              ((TextView) vi.findViewById(R.id.row_number)).setTextColor(mListRowTextColor);
         }
 
         if (isForDateView){
