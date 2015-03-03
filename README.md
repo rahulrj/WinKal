@@ -82,6 +82,60 @@ There are functions available to customize the color and background of every com
   
 
 ### Handling rotation 
+To handle rotaion, these methods are provided 
+```
+public Bundle getSavedStates();
+public void saveStatesToKey(Bundle outState, String key);
+public void restoreStatesFromKey(Bundle savedInstanceState, String key);
+public void restoreDialogStatesFromKey(FragmentManager manager, Bundle savedInstanceState, String key, String dialogTag)
+```
+
+Using above methods, while rotation, the current state and variables can be saved in the Activity as 
+```
+@Override
+protected void onSaveInstanceState(Bundle outState) {
+    // TODO Auto-generated method stub
+    super.onSaveInstanceState(outState);
+
+    if (mDatePickerFragment != null) {
+        mDatePickerFragment.saveStatesToKey(outState, "CALENDAR_SAVED_STATE");
+    }
+}
+```
+and the values can be restored in ```onCreate(Bundle savedInstanceState)``` as following
+```
+if (savedInstanceState != null) {
+  mDatePickerFragment.restoreStatesFromKey(savedInstanceState,
+                    "CALENDAR_SAVED_STATE");
+}
+
+// If activity is created from fresh
+else {
+  Bundle args = new Bundle();
+  //put params in args
+  mDatePickerFragment.setArguments(args);
+  }
+  ```
+If you use this as a DialogFragment, you can use ``restoreDialogStatesFromKey``
+
+```
+final String dialogTag = "CALENDAR_DIALOG_FRAGMENT";
+if (savedInstanceState != null) {
+  mDatePickerDialogFragment.restoreDialogStatesFromKey(getSupportFragmentManager(),
+                        savedInstanceState, "DIALOG_CALENDAR_SAVED_STATE",
+                        dialogTag);
+    Bundle args = dialogCaldroidFragment.getArguments();
+    args.putString("dialogTitle", "Select a date");
+} else {
+    // Setup arguments
+    Bundle bundle = new Bundle();
+    // Setup dialogTitle
+    bundle.putString(Constants.DIALOG_TITLE, "Select a date");
+    mDatePickerDialogFragment.setArguments(bundle);
+}
+
+```
+P.S: The rotation handling has been adapted from [Caldroid](https://github.com/roomorama/Caldroid)
 
 
 
