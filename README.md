@@ -53,8 +53,33 @@ t.commit();
 ### Setting as a DialogFragment
 
 ### Getting the values back from it
+To get the selected date back from the DatePicker fragment to the Activity( MainActivity in my sample project), you can use a callback.
+```
+     DateSelectListener dateSelectListener=new DateSelectListener() {
+            @Override
+            public void onSelectDate(int date, int month, int year) {
+
+                mSelectedDate=date;
+                mSelectedMonth=month;
+                mSelectedYear=year;
+
+                Toast.makeText(MainActivity.this, "" + month + " " + year + " " + date, Toast.LENGTH_LONG).show();
+            }
+        };
+
+        mDatePickerFragment.setDateSelectListener(dateSelectListener);
+```
 
 ### Customization 
+There are functions available to customize the color and background of every component here. These functions can be used before setting the fragment in the activity.
+```
+  public void setBackgroundDrawable(int resId); // set color or drawable for calendar background
+  public void setSelectedRowBackground(int resId);  // set the color or drawable for selected row
+  public void setListRowBackground(int resId);   //set color or drawable for ListView rows
+  public void setListRowTextColor(int colorId);    // set textcolor for ListView rows 
+  public void setSelectedListRowTextColor(int color);  // set textColor for selected ListView rows
+  ```
+  
 
 ### Handling rotation 
 
