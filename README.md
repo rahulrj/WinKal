@@ -9,7 +9,7 @@ It can be customized and used with the cool animations of Material Designs to pr
   
 ## Demo  
 
-![](http://i.imgur.com/A3Wm9q1.png)
+![](http://i.imgur.com/NQhlajw.png)
 
 
 ## Usage  
