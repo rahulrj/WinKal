@@ -20,6 +20,9 @@ project,specify ```compile project(':WinKal')``` in the build.gradle file.
 
 #### Eclipse
 
+For people using Eclipse( still!!!), you can import this project in Eclipse. In Project->Properties,check isLibrary option.
+Also this library depends on ```android-support-v7-appcompat``` library and ```android-support-v4.jar```, so for this library make sure you add ```andorid-appcompat``` and v4 jar in it.
+In project.properties,change target to ```android-21``` if its not there. Now you can add this project as a library for other project.
 
 ## How To Use?
 
