@@ -204,8 +204,8 @@ public class MonthYearAdapter extends BaseAdapter{
 
             vi.setVisibility(View.VISIBLE);
             vi.setBackgroundResource(mSelectedRowBackground);
-            ((TextView) vi.findViewById(R.id.row_text)).setTextColor(mSelectedRowTextColor);
-            ((TextView) vi.findViewById(R.id.row_number)).setTextColor(mSelectedRowTextColor);
+            ((TextView) vi.findViewById(R.id.row_text)).setTextColor(context.getResources().getColor(mSelectedRowTextColor));
+            ((TextView) vi.findViewById(R.id.row_number)).setTextColor(context.getResources().getColor(mSelectedRowTextColor));
            // vi.setBackgroundColor(context.getResources().getColor(R.color.material_selected_row_color));
 
 
@@ -215,8 +215,8 @@ public class MonthYearAdapter extends BaseAdapter{
 
           //  ((TextView) vi.findViewById(R.id.row_text)).setTextColor(context.getResources().getColor(R.color.material_text_color));
           //  ((TextView) vi.findViewById(R.id.row_number)).setTextColor(context.getResources().getColor(R.color.material_text_color));
-              ((TextView) vi.findViewById(R.id.row_text)).setTextColor(mListRowTextColor);
-              ((TextView) vi.findViewById(R.id.row_number)).setTextColor(mListRowTextColor);
+              ((TextView) vi.findViewById(R.id.row_text)).setTextColor(context.getResources().getColor(mListRowTextColor));
+              ((TextView) vi.findViewById(R.id.row_number)).setTextColor(context.getResources().getColor(mListRowTextColor));
         }
 
         if (isForDateView){

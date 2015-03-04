@@ -11,6 +11,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -39,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DatePickerFragment extends DialogFragment {
 
 
+    private View mFragmentView;
     private RelativeLayout mRootLayout;
     private ListView mMonthListview;
     private ListView mDateListView;
@@ -81,10 +83,6 @@ public class DatePickerFragment extends DialogFragment {
     //private int mInitialMonth;
 
     private int mMiddlePositionFromTop;
-
-    private int mInitialMonth = 0;
-    private int mFinalMonth = 0;
-
     private int ACTION_MOVED=0;
     private String mDialogTitle;
 
@@ -123,8 +121,9 @@ public class DatePickerFragment extends DialogFragment {
     private int mBackgroundResourceId=R.color.material_background;
     private int mSelectedRowResourceId=R.color.material_selected_row_color;
     private int mListRowBackgroundResourceId=R.drawable.list_border;
-    private int mListRowTextColor=Color.WHITE;
-    private int mSelectedListRowTextColor=Color.WHITE;
+    private int mListRowTextColor=R.color.material_text_color;
+    private int mSelectedListRowTextColor=R.color.material_text_color;
+
 
 
 
@@ -132,6 +131,23 @@ public class DatePickerFragment extends DialogFragment {
     public View  onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
+
+        mFragmentView = inflater.inflate(R.layout.date_picker, container, false);
+
+        return mFragmentView;
+
+    }
+
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+
+        //initializeColorVariables();
+        mActionBar=((ActionBarActivity)getActivity()).getSupportActionBar();
+        setClickListenerOnActionBar(mActionBar);
 
         getCurrentDate();
         retrieveInitialArgs();
@@ -144,11 +160,11 @@ public class DatePickerFragment extends DialogFragment {
             }
         }
 
-        View view = inflater.inflate(R.layout.date_picker, container, false);
 
-        mMonthListview = (ListView) view.findViewById(R.id.month_listview);
-        mDateListView = (ListView) view.findViewById(R.id.date_listview);
-        mYearListView = (ListView) view.findViewById(R.id.year_listview);
+
+        mMonthListview = (ListView) mFragmentView.findViewById(R.id.month_listview);
+        mDateListView = (ListView) mFragmentView.findViewById(R.id.date_listview);
+        mYearListView = (ListView) mFragmentView.findViewById(R.id.year_listview);
         mColorDrawable = new ColorDrawable(Color.rgb(255, 255, 255));
 
         initializeObjects();
@@ -171,7 +187,7 @@ public class DatePickerFragment extends DialogFragment {
         mDateListView.setAdapter(mDateAdapter);
 
         setCurrentPositionsInListViews();
-        mRootLayout = (RelativeLayout)view. findViewById(R.id.root_layout);
+        mRootLayout = (RelativeLayout)mFragmentView. findViewById(R.id.root_layout);
 
         ViewTreeObserver vto = mRootLayout.getViewTreeObserver();
         vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -198,17 +214,15 @@ public class DatePickerFragment extends DialogFragment {
             }
         });
 
-        return view;
-
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    private void initializeColorVariables(){
 
-        mActionBar=((MainActivity)getActivity()).getSupportActionBar();
-        setClickListenerOnActionBar(mActionBar);
-
+         mBackgroundResourceId=R.color.material_background;
+         mSelectedRowResourceId=R.color.material_selected_row_color;
+         mListRowBackgroundResourceId=R.drawable.list_border;
+         mListRowTextColor=R.color.material_text_color;
+        mSelectedListRowTextColor=R.color.material_text_color;
     }
 
     public void setDateSelectListener(DateSelectListener dateSelectListener){
@@ -396,17 +410,17 @@ public class DatePickerFragment extends DialogFragment {
      *    set the textcolor of each listview row
      */
 
-    public void setListRowTextColor(int color){
+    public void setListRowTextColor(int colorId){
 
-        mListRowTextColor=color;
+        mListRowTextColor=colorId;
     }
 
     /**
      *    set the textcolor of selected  listview row
      */
-    public void setSelectedListRowTextColor(int color){
+    public void setSelectedListRowTextColor(int colorId){
 
-            mSelectedListRowTextColor=color;
+            mSelectedListRowTextColor=colorId;
     }
 
 
@@ -419,7 +433,7 @@ public class DatePickerFragment extends DialogFragment {
                 mMiddlePositionFromTop = mMonthAdapter.getCurrentPos() - mMonthListview.getFirstVisiblePosition();
                 setAnimationParams();
                 putDummyViewInMiddle();
-                getInitialAndFinalMonth(mMiddlePositionFromTop);
+                //getInitialAndFinalMonth(mMiddlePositionFromTop);
                 mFirstVisiblePositionMonth.set(mMonthListview.getFirstVisiblePosition());
                 mFirstVisiblePositionYear.set(mYearListView.getFirstVisiblePosition());
 
@@ -442,6 +456,7 @@ public class DatePickerFragment extends DialogFragment {
 
                 View middleView=mDateListView.getChildAt(mMiddlePositionFromTop);
                 LayoutInflater inflater = (LayoutInflater)   getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
                 mDummyView=inflater.inflate(R.layout.calendar_row,null);
                 mDummyView.setLayoutParams(new RelativeLayout.LayoutParams(middleView.getWidth(),middleView.getHeight()));
 
@@ -499,15 +514,7 @@ public class DatePickerFragment extends DialogFragment {
         return px;
     }
 
-    protected void getInitialAndFinalMonth(int position) {
 
-        View middleView = mMonthListview.getChildAt(position);
-        if(middleView!=null) {
-            TextView monthView = (TextView) middleView.findViewById(R.id.row_number);
-            mInitialMonth = Integer.parseInt(monthView.getText().toString());
-        }
-
-    }
 
 
     private void initializeObjects() {
@@ -743,12 +750,13 @@ public class DatePickerFragment extends DialogFragment {
 
            }
 
+
         mColorDrawable.setAlpha(fadeFraction);
         TextView rowText=(TextView)mDummyView.findViewById(R.id.row_text);
         if(fadeFraction==0){
 
             //rowText.setTextColor(getResources().getColor(R.color.material_selected_row_color));
-            rowText.setTextColor(mSelectedListRowTextColor);
+            rowText.setTextColor(getResources().getColor(mSelectedRowResourceId));
         }
         else {
             rowText.setTextColor(mColorDrawable.getColor());
@@ -843,7 +851,7 @@ public class DatePickerFragment extends DialogFragment {
         int yearText = Integer.parseInt(year.getText().toString());
         int monthText = Integer.parseInt(month.getText().toString());
 
-        mFinalMonth = monthText;
+        //mFinalMonth = monthText;
         findCalendarForCurrentMonth(yearText, monthText);
         setNewDatesInDateAdapter(yearText, monthText);
         mMonthOrYearTouched=false;

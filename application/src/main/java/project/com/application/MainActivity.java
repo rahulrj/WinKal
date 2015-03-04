@@ -1,10 +1,13 @@
-package wincal.android.com.wincal;
+package project.com.application;
 
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.Toast;
+
+import wincal.android.com.wincal.DatePickerFragment;
+import wincal.android.com.wincal.DateSelectListener;
 
 /**
  * Created by Rahul Raja on 12/24/2014.
@@ -45,8 +48,8 @@ public class MainActivity extends ActionBarActivity {
             mDatePickerFragment.restoreStatesFromKey(savedInstanceState,"CALENDAR_SAVED_STATE");
         }
 
-            transaction.replace(R.id.container, mDatePickerFragment);
-            transaction.commit();
+        transaction.replace(R.id.container, mDatePickerFragment);
+        transaction.commit();
 
 
 
@@ -58,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
                 mSelectedMonth=month;
                 mSelectedYear=year;
 
-                Toast.makeText(MainActivity.this,""+month+" "+year+" "+date,Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "" + month + " " + year + " " + date, Toast.LENGTH_LONG).show();
             }
         };
 
