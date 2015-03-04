@@ -9,7 +9,7 @@ It can be customized and used with the cool animations of Material Designs to pr
   
 ## Demo  
 
-![](http://i.imgur.com/NQhlajw.png) ![](http://winkal.16mb.com/winwin4.gif)
+![](http://i.imgur.com/NQhlajw.png)         ![](http://winkal.16mb.com/winwin4.gif)
 
 
 ## Usage  
