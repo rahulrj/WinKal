@@ -55,6 +55,21 @@ t.commit();
 
 ### Setting as a DialogFragment
 
+Although i will describe how it can be set as a ```DialogFragment```, but currently,there is ```Done``` button in the ```MainActivity```, which cannot be accesses if it is used as ```DialogFragment```. Also going with its design, it wont look good an a ```DialogFragment```.  So i am working on these two things.
+
+But if you can find a way to move the ```Done``` button elsewhere and it looks good to you, here it is
+```
+        mDatePickerDialogFragment=new DatePickerFragment();
+        FragmentManager manager=getSupportFragmentManager();
+        if(savedInstanceState!=null){
+
+                mDatePickerDialogFragment.restoreStatesFromKey(savedInstanceState,"CALENDAR_SAVED_STATE");
+        }
+
+    else
+       mDatePickerDialogFragment.show(manager,"Dialog");
+```
+
 ### Getting the values back from it
 To get the selected date back from the DatePicker fragment to the Activity( MainActivity in my sample project), you can use a callback.
 ```
