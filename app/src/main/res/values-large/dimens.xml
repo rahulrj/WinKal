@@ -3,18 +3,16 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="listview_left_margin">8dp</dimen>
-    <dimen name="listview_right_margin">8dp</dimen>
-    <dimen name="listview_divider_height">8dp</dimen>
+    <dimen name="listview_left_margin">16dp</dimen>
+    <dimen name="listview_right_margin">16dp</dimen>
+    <dimen name="listview_divider_height">12dp</dimen>
 
-
-
-    <dimen name="row_height">120dp</dimen>
+    <dimen name="listview_row_height">140dp</dimen>
     <dimen name="row_content_margin_top">32dp</dimen>
-    <dimen name="row_content_margin_left">8dp</dimen>
-    <dimen name="row_content_bottom_padding">8dp</dimen>
+    <dimen name="row_content_margin_left">16dp</dimen>
+    <dimen name="row_content_bottom_padding">14dp</dimen>
 
-    <dimen name="row_number_font_size">32sp</dimen>
-    <dimen name="row_text_font_size">14sp</dimen>
-    <dimen name="heading_font">20sp</dimen>
+    <dimen name="row_number_font_size">52sp</dimen>
+    <dimen name="row_text_font_size">20sp</dimen>
+    <dimen name="heading_font">24sp</dimen>
 </resources>

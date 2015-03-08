@@ -9,7 +9,7 @@
 
 
 
-    <dimen name="row_height">80dp</dimen>
+    <dimen name="listview_row_height">100dp</dimen>
     <dimen name="row_content_margin_top">32dp</dimen>
     <dimen name="row_content_margin_left">8dp</dimen>
     <dimen name="row_content_bottom_padding">8dp</dimen>

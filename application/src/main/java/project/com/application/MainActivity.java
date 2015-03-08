@@ -79,7 +79,7 @@ public class MainActivity extends ActionBarActivity {
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.action_bar_color)));
 
         getSupportActionBar().setCustomView(R.layout.custom_action_bar);
-        //mOverflowMenu=(ImageView)getSupportActionBar().getCustomView().findViewById(R.id.overflow_menu);
+
     }
 
     @Override

@@ -134,20 +134,8 @@ public class DatePickerFragment extends DialogFragment {
 
         mFragmentView = inflater.inflate(R.layout.date_picker, container, false);
 
-        return mFragmentView;
-
-    }
-
-
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-
         //initializeColorVariables();
-        mActionBar=((ActionBarActivity)getActivity()).getSupportActionBar();
-        setClickListenerOnActionBar(mActionBar);
+
 
         getCurrentDate();
         retrieveInitialArgs();
@@ -159,6 +147,17 @@ public class DatePickerFragment extends DialogFragment {
                 e.printStackTrace();
             }
         }
+
+
+        return mFragmentView;
+
+    }
+
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
 
 
@@ -437,6 +436,9 @@ public class DatePickerFragment extends DialogFragment {
                 mFirstVisiblePositionMonth.set(mMonthListview.getFirstVisiblePosition());
                 mFirstVisiblePositionYear.set(mYearListView.getFirstVisiblePosition());
 
+                mActionBar=((ActionBarActivity)getActivity()).getSupportActionBar();
+                setClickListenerOnActionBar(mActionBar);
+
     }
 
     private void setAnimationParams(){
@@ -463,6 +465,7 @@ public class DatePickerFragment extends DialogFragment {
                 int location[]=new int[2];
                 middleView.getLocationInWindow(location);
                 mDummyView.setX(location[0]);
+               // mDummyView.setX(middleView.getX());
                 mDummyView.setY(middleView.getY());
 
                 setDataInDummyView();

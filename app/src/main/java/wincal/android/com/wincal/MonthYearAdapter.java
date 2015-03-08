@@ -161,7 +161,7 @@ public class MonthYearAdapter extends BaseAdapter{
 
         View vi = convertView;
         if (vi == null)
-            vi = inflater.inflate(R.layout.calendar_row, null);
+            vi = inflater.inflate(R.layout.calendar_row, parent,false);
         else {
             if(vi.getVisibility()==View.INVISIBLE)
                 vi.setVisibility(View.VISIBLE);
