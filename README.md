@@ -156,7 +156,7 @@ if (savedInstanceState != null) {
 P.S: The rotation handling has been adapted from [Caldroid](https://github.com/roomorama/Caldroid)
 
 ## To Be Done
-Make the library independent of ActionBar
+Make the library independent of ActionBar  
 Adding more customization options for Colors etc.
 
 
